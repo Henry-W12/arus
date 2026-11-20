@@ -406,8 +406,7 @@ button.ui-row__content:active,
 
 /* ---------- Amount ---------- */
 .ui-amount {
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
+  white-space: nowrap; /* tabular-nums: lihat base.css (.num/.ui-amount) */
 }
 .ui-amount--body { font: var(--t-body); font-weight: 500; letter-spacing: var(--t-body-ls); }
 .ui-amount--title { font: var(--t-title); letter-spacing: var(--t-title-ls); }
@@ -702,7 +701,8 @@ html.kb-open .ui-sheet__body { padding-bottom: var(--s-4); }
   transition: opacity var(--m-quick) var(--ease-std), transform var(--m-quick) var(--ease-std);
 }
 .ui-toast:not(:has(.ui-toast__action)) { padding-right: var(--s-4); }
-.ui-toast.is-leaving { opacity: 0; }
+.ui-toast.is-leaving { opacity: 0; pointer-events: none; }
+.ui-toast.is-leaving * { pointer-events: none; }
 .ui-toast.is-error::before {
   content: '';
   width: 8px;

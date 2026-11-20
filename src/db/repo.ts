@@ -1,5 +1,6 @@
 import { computeBalances } from '../lib/balances';
 import { todayLocal } from '../lib/dates';
+import { isScheduled } from '../lib/effective';
 import { RepoError } from '../lib/errors';
 import { newId } from '../lib/id';
 import { isValidAdjustmentAmount, isValidAmount } from '../lib/money';
@@ -644,7 +645,7 @@ export async function resumeRecurring(
 
 /** Jumlah transaksi aturan ini yang bertanggal > today. */
 export async function countFutureTransactionsOfRule(id: ID, today: LocalDate = todayLocal()): Promise<number> {
-  return db.transactions.where('recurringId').equals(id).filter((t) => t.date > today).count();
+  return db.transactions.where('recurringId').equals(id).filter((t) => isScheduled(t, today)).count();
 }
 
 /** Hapus aturan. Transaksi yang sudah dibuat tetap ada, kecuali `deleteFuture` (tanggal > today). */
@@ -656,7 +657,7 @@ export async function deleteRecurring(
   await db.transaction('rw', [db.recurring, db.transactions], async () => {
     await db.recurring.delete(id);
     if (options.deleteFuture) {
-      await db.transactions.where('recurringId').equals(id).filter((t) => t.date > today).delete();
+      await db.transactions.where('recurringId').equals(id).filter((t) => isScheduled(t, today)).delete();
     }
   });
 }

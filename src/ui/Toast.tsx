@@ -46,24 +46,29 @@ let seq = 0
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [item, setItem] = useState<ToastItem | null>(null)
   const [leaving, setLeaving] = useState(false)
-  const timer = useRef<number | undefined>(undefined)
+  /** Timer auto-hilang dan timer unmount dipisah: efek auto-hilang tidak boleh
+   *  membatalkan unmount (BUG-02 — toast tak terlihat tertinggal & menangkap tap). */
+  const autoTimer = useRef<number | undefined>(undefined)
+  const exitTimer = useRef<number | undefined>(undefined)
 
   const current = useRef<ToastItem | null>(null)
 
   const dismiss = useCallback((id?: string) => {
     const cur = current.current
     if (!cur || (id && cur.id !== id)) return
-    window.clearTimeout(timer.current)
+    window.clearTimeout(autoTimer.current)
+    window.clearTimeout(exitTimer.current)
+    current.current = null
     setLeaving(true)
-    timer.current = window.setTimeout(() => {
-      current.current = null
+    exitTimer.current = window.setTimeout(() => {
       setItem(null)
       setLeaving(false)
     }, 160)
   }, [])
 
   const show = useCallback((t: ToastOptions) => {
-    window.clearTimeout(timer.current)
+    window.clearTimeout(autoTimer.current)
+    window.clearTimeout(exitTimer.current)
     const next = { ...t, key: ++seq }
     current.current = next
     setLeaving(false)
@@ -74,9 +79,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     if (!item || leaving) return
     const d = item.duration ?? 5000
     if (!Number.isFinite(d)) return
-    timer.current = window.setTimeout(() => dismiss(), d)
-    return () => window.clearTimeout(timer.current)
+    autoTimer.current = window.setTimeout(() => dismiss(), d)
+    return () => window.clearTimeout(autoTimer.current)
   }, [item, leaving, dismiss])
+
+  useEffect(
+    () => () => {
+      window.clearTimeout(autoTimer.current)
+      window.clearTimeout(exitTimer.current)
+    },
+    [],
+  )
 
   const api = useMemo(() => ({ show, dismiss }), [show, dismiss])
 
@@ -98,6 +111,7 @@ function ToastView({ item, leaving, onDismiss }: { item: ToastItem; leaving: boo
   const drag = useRef<{ y0: number; id: number } | null>(null)
 
   const onDown = (e: RPointerEvent<HTMLDivElement>) => {
+    if (leaving) return
     if ((e.target as HTMLElement).closest('button')) return
     drag.current = { y0: e.clientY, id: e.pointerId }
     e.currentTarget.setPointerCapture(e.pointerId)
@@ -131,13 +145,17 @@ function ToastView({ item, leaving, onDismiss }: { item: ToastItem; leaving: boo
       onPointerMove={onMove}
       onPointerUp={onUp}
       onPointerCancel={onUp}
+      aria-hidden={leaving || undefined}
     >
       <span className="ui-toast__msg">{item.message}</span>
       {item.action && (
         <button
           type="button"
           className="ui-toast__action"
+          tabIndex={leaving ? -1 : undefined}
           onClick={() => {
+            // Pertahanan kedua: toast yang sedang keluar tidak boleh menjalankan aksi.
+            if (leaving) return
             item.action!.onAction()
             onDismiss()
           }}

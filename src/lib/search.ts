@@ -3,6 +3,7 @@ import { compareNewestFirst } from './balances';
 import { parseLocalDate } from './dates';
 import { parseAmountText } from './money';
 import { periodOf, shiftPeriod, periodByKey } from './period';
+import { isScheduled } from './effective';
 import { totalsOf, type Totals } from './summary';
 
 export interface SearchFilter {
@@ -104,7 +105,10 @@ export function makeMatcher(filter: SearchFilter, lookup: SearchLookup): (tx: Tr
 export interface SearchResult {
   items: Transaction[];
   count: number;
+  /** Hanya transaksi yang sudah berlaku (terjadwal tidak dihitung, PRD §5.1). */
   totals: Totals;
+  /** Jumlah hasil yang masih terjadwal (tampil, tetapi tidak masuk `totals`). */
+  scheduledCount: number;
 }
 
 /** Filter in-memory, hasil urut terbaru dulu. */
@@ -112,10 +116,13 @@ export function searchTransactions(
   txs: readonly Transaction[],
   filter: SearchFilter,
   lookup: SearchLookup,
+  today?: LocalDate,
 ): SearchResult {
   const match = makeMatcher(filter, lookup);
   const items = txs.filter(match).sort(compareNewestFirst);
-  return { items, count: items.length, totals: totalsOf(items) };
+  const scheduled = today ? items.filter((t) => isScheduled(t, today)) : [];
+  const effective = scheduled.length ? items.filter((t) => !isScheduled(t, today!)) : items;
+  return { items, count: items.length, totals: totalsOf(effective), scheduledCount: scheduled.length };
 }
 
 export type DatePreset = 'thisPeriod' | 'lastPeriod' | 'last3Periods' | 'thisYear';

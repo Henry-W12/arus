@@ -18,3 +18,13 @@ describe('larangan tanggal UTC (PRD §5.7)', () => {
     expect(offenders).toEqual([]);
   });
 });
+
+describe('aturan transaksi terjadwal di satu tempat (PRD §5.1, BUG-01)', () => {
+  it('perbandingan tanggal dengan "today" hanya di lib/effective.ts', () => {
+    const offenders = Object.entries(sources)
+      .filter(([file]) => !file.endsWith('/effective.ts'))
+      .filter(([, text]) => /\.date\s*[<>]=?\s*(today|asOf)\b/.test(text))
+      .map(([file]) => file);
+    expect(offenders).toEqual([]);
+  });
+});

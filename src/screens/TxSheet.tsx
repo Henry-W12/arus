@@ -139,8 +139,16 @@ function TxSheetBody({ open, tx, startMode, defaultAccount, accounts, categories
   const [date, setDate] = useState<LocalDate>(tx?.date ?? today)
   const [note, setNote] = useState(tx?.note ?? '')
   const [repeat, setRepeat] = useState<Frequency | null>(null)
-  const [sub, setSub] = useState<Sub>(null)
-  const [confirmDiscard, setConfirmDiscard] = useState(false)
+  const [subState, setSub] = useState<Sub>(null)
+  const [discardState, setConfirmDiscard] = useState(false)
+  // Sub-sheet & dialog hanya bisa terbuka selama sheet induk terbuka (BUG-03: back browser
+  // menutup induk lewat URL; tanpa ini sub-sheet tertinggal yatim).
+  const sub = open ? subState : null
+  const confirmDiscard = open && discardState
+  if (!open && (subState !== null || discardState)) {
+    setSub(null)
+    setConfirmDiscard(false)
+  }
   const [shake, setShake] = useState(0)
   const [busy, setBusy] = useState(false)
   const compact = useCompactHeight()

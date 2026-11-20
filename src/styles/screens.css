@@ -490,6 +490,7 @@
   color: var(--ink-2);
 }
 .s-result-sum .ui-amount { font-weight: 600; }
+.s-result-sum__note { font-weight: 400; }
 .s-result-sum__reset { font: var(--t-footnote); font-weight: 600; color: var(--accent); padding: var(--s-2) 0 var(--s-2) var(--s-3); }
 .s-suggest-block { padding: var(--s-6) var(--gutter) 0; }
 .s-suggest-block .s-suggest__chips + .s-suggest__label { margin-top: var(--s-6); }

@@ -1,4 +1,5 @@
 import type { Budget, Category, ID, LocalDate, PeriodKey, Transaction } from '../db/schema';
+import { isEffective } from './effective';
 import { daysRemaining, isDateInPeriod, type Period } from './period';
 
 export type BudgetStatus = 'normal' | 'warning' | 'over';
@@ -64,7 +65,7 @@ export interface BudgetOverview {
 
 /**
  * Progres anggaran satu periode. Kategori diarsipkan hanya tampil pada periode lampau
- * atau jika masih punya pengeluaran di periode itu.
+ * atau jika masih punya pengeluaran di periode itu. Transaksi terjadwal (`date > today`) tidak dihitung.
  */
 export function budgetOverview(params: {
   budgets: readonly Budget[];
@@ -78,6 +79,7 @@ export function budgetOverview(params: {
   const spentBy = new Map<ID, number>();
   for (const tx of transactions) {
     if (tx.type !== 'expense' || !tx.categoryId || !isDateInPeriod(tx.date, period)) continue;
+    if (!isEffective(tx, today)) continue; // terjadwal belum memakai anggaran (PRD §5.1)
     spentBy.set(tx.categoryId, (spentBy.get(tx.categoryId) ?? 0) + tx.amount);
   }
 

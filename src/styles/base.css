@@ -97,8 +97,15 @@ a {
 
 /* ---------- Utilitas tipografi ---------- */
 
-.num {
-  font-variant-numeric: tabular-nums;
+/* Angka tabular untuk semua nominal (AC-UI-05). `!important` disengaja: shorthand `font:`
+ * (dipakai semua token tipografi) me-reset font-variant-numeric, dan aturan `font:` di
+ * komponen/layar datang belakangan atau lebih spesifik (BUG-04). Utilitas ini harus selalu menang. */
+.num,
+.num *,
+.ui-amount,
+.ui-amount *,
+.ui-amount-display * {
+  font-variant-numeric: tabular-nums !important;
 }
 
 .t-hero { font: var(--t-hero); letter-spacing: var(--t-hero-ls); }

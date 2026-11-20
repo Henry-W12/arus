@@ -329,7 +329,7 @@ test('Eksplorasi · fokus keyboard: Tab dari sheet input tetap di dalam sheet, f
   expect(inside.every(Boolean)).toBe(true)
 })
 
-test('Eksplorasi · tombol back browser: sheet edit, sub-sheet tanggal, dan layar turunan', async ({ page }) => {
+test('BUG-03 · tombol back browser: sheet edit, sub-sheet tanggal, dan layar turunan', async ({ page }) => {
   const d = await boot(page)
   await seedTx(page, d, [{ amount: 1000, note: 'Back test' }])
   await page.locator('.s-daylist .ui-row__content').first().click()
@@ -337,7 +337,10 @@ test('Eksplorasi · tombol back browser: sheet edit, sub-sheet tanggal, dan laya
   await page.locator('.tx-sheet__ctx .ui-chip', { hasText: 'Hari ini' }).click()
   await expect(page.locator('.ui-sheet.is-open')).toHaveCount(2)
   await page.goBack()
-  await page.waitForTimeout(500)
+  // BUG-03: back menutup sheet induk → sub-sheet "Tanggal" ikut tertutup (tidak yatim).
+  await expect(page.locator('.ui-sheet.is-open')).toHaveCount(0)
+  await expect(page).toHaveURL(/\/$/)
+  await page.waitForTimeout(300)
   await shot(page, 'back-orphan-datepicker')
   const afterOne = { sheets: await page.locator('.ui-sheet.is-open').evaluateAll((e) => e.map((x) => x.className)), url: page.url() }
   await page.goBack()

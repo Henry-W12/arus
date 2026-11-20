@@ -7,6 +7,7 @@ import type { Account, Category, CategoryKind, ColorToken, IconName as EntityIco
 import { COLOR_TOKENS } from '../db/iconIds'
 import { deleteTransaction, restoreTransaction } from '../db/repo'
 import { transactionEffect } from '../lib/balances'
+import { isScheduled } from '../lib/effective'
 import {
   addDays,
   dayLabel,
@@ -170,7 +171,7 @@ export function DayList({ groups, today, lookup, onOpen, onDelete, accountId, ru
   return (
     <div className="s-daylist">
       {visible.map((g) => {
-        const future = g.date > today
+        const future = isScheduled(g, today)
         const hasFlow = g.items.some((t) => t.type === 'income' || t.type === 'expense')
         return (
           <section key={g.date}>

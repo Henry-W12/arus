@@ -187,6 +187,7 @@ export function SearchScreen() {
                     <AmountText value={Math.abs(result.totals.net)} kind={result.totals.net >= 0 ? 'income' : 'expense'} size="inherit" />
                   </>
                 )}
+                {result.scheduledCount > 0 && <span className="s-result-sum__note"> · {result.scheduledCount} terjadwal belum dihitung</span>}
               </span>
               {(hasFilter || f.query) && (
                 <button type="button" className="s-result-sum__reset" onClick={reset}>

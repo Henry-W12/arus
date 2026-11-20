@@ -77,10 +77,13 @@ export function donutSegments(rows: readonly CategoryRow[], maxSegments = 6): Do
   ];
 }
 
-/** Perubahan relatif terhadap periode sebelumnya. `null` jika sebelumnya 0 (tampilkan "—"). */
+/**
+ * Perubahan relatif terhadap periode sebelumnya. `null` jika sebelumnya 0 (tampilkan "—").
+ * Dibagi |previous| agar tanda selalu = arah perubahan (−200rb → −100rb = +50%, membaik).
+ */
 export function deltaRatio(current: number, previous: number): number | null {
   if (previous === 0) return null;
-  return (current - previous) / previous;
+  return (current - previous) / Math.abs(previous);
 }
 
 export interface DayGroup {

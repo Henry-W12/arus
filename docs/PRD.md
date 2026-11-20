@@ -333,7 +333,8 @@ Total: **4 tap, ±3 detik.** Jika app di-*resume* dari background (bukan cold st
 ## 5. Aturan bisnis
 
 ### 5.1 Perhitungan umum
-- **Pemasukan/Pengeluaran periode** = Σ amount transaksi `income`/`expense` dengan `date` di dalam rentang periode. `transfer` dan `adjustment` **tidak** dihitung di ringkasan, anggaran, maupun total harian.
+- **Pemasukan/Pengeluaran periode** = Σ amount transaksi `income`/`expense` dengan `date` di dalam rentang periode **dan `date ≤ hari ini`**. `transfer` dan `adjustment` **tidak** dihitung di ringkasan, anggaran, maupun total harian.
+- **Transaksi terjadwal** (`date > hari ini`) tampil di grup "Terjadwal" tetapi **tidak** dihitung di total/ringkasan/tren/anggaran/saldo maupun jumlah hasil pencarian sampai tanggalnya tiba (Cari menampilkan "n terjadwal belum dihitung"). Satu-satunya implementasi aturan ini: `src/lib/effective.ts`.
 - **Saldo akun** = rumus di §2, hanya atas transaksi dengan `date ≤ hari ini`. Transaksi bertanggal masa depan (dari input manual atau aturan berulang) ditampilkan sebagai "Terjadwal" dan baru memengaruhi saldo pada hari tersebut. Detail akun menampilkan "Saldo setelah terjadwal: Rp …" jika ada.
 - **Total saldo** = Σ saldo akun aktif dengan `includeInTotal=1`. Akun yang diarsipkan tidak dihitung (pengguna disarankan menyesuaikan saldo ke 0 sebelum mengarsipkan; tampilkan peringatan jika saldo ≠ 0).
 

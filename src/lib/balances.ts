@@ -1,4 +1,5 @@
 import type { Account, ID, LocalDate, Transaction } from '../db/schema';
+import { isEffective } from './effective';
 
 export type BalanceMap = Map<ID, number>;
 
@@ -27,7 +28,7 @@ export function transactionEffect(tx: Transaction, accountId: ID): number {
 export function computeBalances(accounts: readonly Account[], txs: readonly Transaction[], asOf?: LocalDate): BalanceMap {
   const balances: BalanceMap = new Map(accounts.map((a) => [a.id, a.openingBalance]));
   for (const tx of txs) {
-    if (asOf !== undefined && tx.date > asOf) continue;
+    if (asOf !== undefined && !isEffective(tx, asOf)) continue;
     const from = balances.get(tx.accountId);
     if (tx.type === 'transfer') {
       if (from !== undefined) balances.set(tx.accountId, from - tx.amount);

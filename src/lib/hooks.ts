@@ -17,6 +17,7 @@ import type {
 import { computeBalances, runningBalances, totalBalance, type BalanceMap } from './balances';
 import { budgetOverview, type BudgetOverview } from './budget';
 import { todayLocal } from './dates';
+import { effectiveOnly } from './effective';
 import { periodByKey, periodOf, shiftPeriod, type Period } from './period';
 import { recentNotes, searchTransactions, type SearchFilter, type SearchResult } from './search';
 import { shouldShowBackupReminder, isStandalone } from './storage';
@@ -26,8 +27,10 @@ import {
   donutSegments,
   earliestDate,
   groupByDay,
+  periodTotals,
   periodTrend,
   totalsOf,
+  transactionsInPeriod,
   type CategoryRow,
   type DayGroup,
   type DonutSegment,
@@ -133,18 +136,20 @@ export interface PeriodTransactions {
   period: Period;
   /** Per hari, terbaru di atas; item urut `createdAt` menurun. */
   groups: DayGroup[];
+  /** Hanya transaksi yang sudah berlaku (PRD §5.1). */
   totals: Totals;
   count: number;
 }
 
 /** Daftar transaksi satu periode (tab Transaksi; muat periode sebelumnya dengan `shiftPeriod`). */
 export function usePeriodTransactions(key?: PeriodKey): PeriodTransactions | undefined {
+  const today = useToday();
   const period = usePeriod(key);
   const txs = useTransactionsInRange(period?.start, period?.end);
   return useMemo(() => {
     if (!period || !txs) return undefined;
-    return { period, groups: groupByDay(txs), totals: totalsOf(txs), count: txs.length };
-  }, [period, txs]);
+    return { period, groups: groupByDay(txs), totals: totalsOf(effectiveOnly(txs, today)), count: txs.length };
+  }, [period, txs, today]);
 }
 
 /** Transaksi bertanggal setelah `date` (mis. terjadwal di luar periode berjalan). */
@@ -216,20 +221,22 @@ export interface PeriodSummary {
   firstKey: PeriodKey | null;
 }
 
-/** Data layar Ringkasan untuk periode `key` dan jenis donat `kind`. */
+/** Data layar Ringkasan untuk periode `key` dan jenis donat `kind`. Transaksi terjadwal tidak dihitung. */
 export function usePeriodSummary(key: PeriodKey | undefined, kind: CategoryKind = 'expense'): PeriodSummary | undefined {
   const settings = useSettings();
-  const txs = useAllTransactions();
+  const today = useToday();
+  const all = useAllTransactions();
   return useMemo(() => {
-    if (!settings || !txs || !key) return undefined;
+    if (!settings || !all || !key) return undefined;
+    const txs = effectiveOnly(all, today);
     const s = settings.periodStartDay;
     const period = periodByKey(key, s);
     const prev = periodByKey(shiftPeriod(key, -1), s);
-    const inPeriod = txs.filter((t) => t.date >= period.start && t.date <= period.end);
+    const inPeriod = transactionsInPeriod(txs, period);
     const totals = totalsOf(inPeriod);
-    const previousTotals = totalsOf(txs.filter((t) => t.date >= prev.start && t.date <= prev.end));
+    const previousTotals = periodTotals(txs, prev);
     const breakdown = categoryBreakdown(inPeriod, kind);
-    const first = earliestDate(txs);
+    const first = earliestDate(all);
     return {
       period,
       totals,
@@ -244,7 +251,7 @@ export function usePeriodSummary(key: PeriodKey | undefined, kind: CategoryKind 
       trend: periodTrend(txs, key, s, 6),
       firstKey: first ? periodOf(first, s).key : null,
     };
-  }, [key, kind, settings, txs]);
+  }, [all, key, kind, settings, today]);
 }
 
 /** Data layar Anggaran untuk periode `key` (default periode berjalan). */
@@ -271,7 +278,11 @@ export function useBudgetOverview(key?: PeriodKey): BudgetOverview | undefined {
 export function useSearch(filter: SearchFilter): SearchResult | undefined {
   const txs = useAllTransactions();
   const lookup = useLookup();
-  return useMemo(() => (txs && lookup ? searchTransactions(txs, filter, lookup) : undefined), [filter, lookup, txs]);
+  const today = useToday();
+  return useMemo(
+    () => (txs && lookup ? searchTransactions(txs, filter, lookup, today) : undefined),
+    [filter, lookup, txs, today],
+  );
 }
 
 /** 5 catatan terakhir untuk kategori (saran input catatan). */

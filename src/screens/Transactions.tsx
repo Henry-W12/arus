@@ -6,7 +6,8 @@ import { diffDays } from '../lib/dates'
 import { useAllTransactions, useBackupReminder, useBalances, useCurrentPeriod, useLookup, useSettings, useToday } from '../lib/hooks'
 import { periodLength } from '../lib/period'
 import { isStandalone, shareOrDownloadFile, snoozeBackupReminder } from '../lib/storage'
-import { groupByDay, totalsOf } from '../lib/summary'
+import { effectiveOnly } from '../lib/effective'
+import { groupByDay, periodTotals } from '../lib/summary'
 import { AmountText, EmptyState, IconButton, Screen, useRouter, useSheet, useToast } from '../ui'
 import { Banner, DayList, errorMessage, useDeleteTx, useHighlightReset } from './shared'
 import { appStore, useAppStore } from './store'
@@ -31,7 +32,7 @@ export function TransactionsScreen() {
 
   const groups = useMemo(() => (txs ? groupByDay(txs) : undefined), [txs])
   const totals = useMemo(
-    () => (txs && period ? totalsOf(txs.filter((t) => t.date >= period.start && t.date <= period.end && t.date <= today)) : undefined),
+    () => (txs && period ? periodTotals(effectiveOnly(txs, today), period) : undefined),
     [txs, period, today],
   )
   const progress = period ? Math.min(1, (diffDays(period.start, today) + 1) / periodLength(period)) : 0

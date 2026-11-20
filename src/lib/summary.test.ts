@@ -45,6 +45,9 @@ describe('ringkasan', () => {
   it('AC-SM-04 delta, null jika sebelumnya 0', () => {
     expect(deltaRatio(112, 100)).toBeCloseTo(0.12);
     expect(deltaRatio(5, 0)).toBeNull();
+    // BUG-05: sebelumnya negatif → tanda mengikuti arah perubahan.
+    expect(deltaRatio(-100_000, -200_000)).toBeCloseTo(0.5);
+    expect(deltaRatio(-300_000, -200_000)).toBeCloseTo(-0.5);
   });
 
   it('AC-LS-01/02 grup per hari, net harian tanpa transfer/adjustment', () => {
