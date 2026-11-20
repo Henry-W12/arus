@@ -283,7 +283,7 @@
   transition: background-color var(--m-quick) var(--ease-std);
 }
 .ui-section--sticky.is-stuck {
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  background: color-mix(in srgb, var(--bg) 97%, transparent);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
@@ -776,7 +776,7 @@ html.kb-open .ui-sheet__body { padding-bottom: var(--s-4); }
   transition: background-color var(--m-quick) var(--ease-std), border-color var(--m-quick) var(--ease-std);
 }
 .ui-nav.is-scrolled {
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  background: color-mix(in srgb, var(--bg) 97%, transparent);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
   backdrop-filter: blur(20px) saturate(1.4);
   border-bottom-color: var(--line);
@@ -833,7 +833,7 @@ html.kb-open .ui-sheet__body { padding-bottom: var(--s-4); }
   padding-bottom: var(--safe-bottom);
   padding-left: max(var(--safe-left), calc((100% - var(--content-max)) / 2));
   padding-right: max(var(--safe-right), calc((100% - var(--content-max)) / 2));
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  background: color-mix(in srgb, var(--bg) 97%, transparent);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
   backdrop-filter: blur(20px) saturate(1.4);
   border-top: var(--hairline);
@@ -1064,3 +1064,15 @@ html.kb-open .ui-fab {
 @media (prefers-reduced-motion: reduce) {
   .ui-cat-cell:active .ui-cat-cell__icon { transform: none; }
 }
+
+/* Bar translusen: latar 97% (bukan 82%) agar teks di belakang tidak terbaca di WebKit
+   tanpa backdrop-filter; tanpa dukungan blur sama sekali → latar opak. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ui-nav.is-scrolled,
+  .ui-tabbar,
+  .ui-section--sticky.is-stuck { background: var(--bg); }
+}
+
+/* Action sheet multi-pilihan */
+.ui-action__btn--sep + .ui-action__btn--sep { border-top: var(--hairline); }
+.ui-action__btn:disabled { color: var(--ink-3); }

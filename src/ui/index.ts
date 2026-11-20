@@ -43,3 +43,4 @@ export {
   type NavigateOptions,
 } from './router'
 export { CategoryCell, type CategoryCellProps } from './CategoryCell'
+export { ActionSheet, type ActionSheetProps, type ActionSheetOption } from './ActionSheet'

@@ -6,7 +6,7 @@
 | 2. PRD + desain | ✅ | docs/PRD.md, docs/DESIGN.md |
 | 3a. Logika data | ✅ | src/db, src/lib, docs/API.md (144 tes vitest hijau) |
 | 3b. Fondasi UI + PWA | ✅ | src/ui, src/styles, public/ (ikon, _headers), vite.config.ts, docs/screens |
-| 3c. Layar | ⬜ | src/screens |
+| 3c. Layar | ⏳ berjalan — selesai: shell, onboarding, kunci PIN, Transaksi, sheet input/edit; sisa: lihat catatan 3c | src/screens |
 | 4. QA | ⬜ | docs/QA_REPORT.md |
 | 5. Perbaikan & finalisasi | ⬜ | |
 
@@ -18,3 +18,9 @@
 - Penyimpangan kecil dari PRD: fungsi murni di `src/lib/` (bukan `src/domain/`); format tanggal pakai tabel nama hari/bulan sendiri (deterministik, bukan `Intl`); restore mempertahankan setting khusus perangkat (PIN, pinLockState, persistGranted, lastBackupAt); setting baru `pinLockState` dan `backupReminderSnoozedUntil`.
 - 3b selesai: token/reset/komponen CSS (`.ui-*`, tanpa Tailwind), 50+ ikon SVG, Keypad, BottomSheet (drag, fokus trap, visualViewport), TabBar+FAB, Screen/NavBar, ListRow (swipe hapus), Toast+Undo, Donut, ProgressBar, router History API, UpdatePrompt (SW prompt). Props: `docs/API.md` § Komponen UI. Galeri dev `/_gallery`.
 - Catatan 3b → 3c: header hari sticky harus dibungkus `<section>` per hari; toast diletakkan di atas FAB (bukan 12 px di atas tab bar) agar tidak menutupi FAB; backdrop-blur tidak tampil di WebKit Windows (screenshot) tapi berjalan di iOS. Ikon tambahan konteks Indonesia (motorbike, droplet, mosque, dst.) belum ada di `ENTITY_ICON_IDS`.
+
+## Catatan 3c (layar)
+- Struktur: `src/screens/` (+ `settings/`), gaya `src/styles/screens.css` (prefiks `.s-`, `.tx-`), state lintas layar `screens/store.ts`, komponen bersama `screens/shared.tsx`. Komponen UI baru: `ActionSheet`.
+- Screenshot: `npm run dev` lalu `node scripts/screens.mjs [light|dark|all] [filter]` → `docs/screens/app-*.png`. Data demo `scripts/demo-seed.ts` (dimuat lewat dev server, tidak ikut bundle app).
+- Perbaikan fondasi: latar nav/tab bar/header sticky 97% (DESIGN 82%) + `@supports` opak — teks di belakang tidak terbaca di WebKit tanpa blur; nominal sheet input mengisi ruang sisa sehingga grid kategori menempel ke keypad; 10 ikon konteks Indonesia masuk `ENTITY_ICON_IDS`, ikon `motorbike` digambar ulang (skuter); `/_gallery` hanya di dev.
+- Onboarding: satu layar sambutan saat DB baru di-seed (tidak disimpan sebagai setting), lalu langsung ke sheet input.

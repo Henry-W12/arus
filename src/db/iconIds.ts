@@ -78,6 +78,17 @@ export const ENTITY_ICON_IDS = [
   'smartphone-wallet',
   'card',
   'dots',
+  // Konteks Indonesia (fase 3c)
+  'motorbike',
+  'train',
+  'droplet',
+  'flame',
+  'tv',
+  'laptop',
+  'scissors',
+  'shield',
+  'angpao',
+  'mosque',
 ] as const;
 
 /** Subset yang ditawarkan di grid ikon sheet akun (12 ikon). */
