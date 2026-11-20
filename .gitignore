@@ -26,3 +26,7 @@ dist-ssr
 dev-dist
 .env*
 coverage
+
+# Playwright
+test-results
+playwright-report
