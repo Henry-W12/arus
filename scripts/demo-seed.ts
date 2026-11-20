@@ -15,7 +15,7 @@ import {
   updateAccount,
   archiveAccount,
 } from '../src/db/repo'
-import { addDays, todayLocal } from '../src/lib/dates'
+import { addDays, todayLocal, weekdayMon0 } from '../src/lib/dates'
 import { periodOf } from '../src/lib/period'
 
 function rng(seed: number) {
@@ -66,7 +66,7 @@ export async function seedDemo(options: { empty?: boolean; pin?: boolean } = {})
   await createRecurring({ type: 'expense', amount: 2_400_000, accountId: bank.id, categoryId: tinggal, note: 'Kos', frequency: 'monthly', interval: 1, anchorDate: p0 }, today)
   await createRecurring({ type: 'expense', amount: 186_000, accountId: cc.id, categoryId: hiburan, note: 'Netflix', frequency: 'monthly', interval: 1, anchorDate: addDays(p0, 13) }, today)
   await createRecurring({ type: 'income', amount: 12_500_000, accountId: bank.id, categoryId: gaji, note: 'Gaji', frequency: 'monthly', interval: 1, anchorDate: addDays(p0, 24) }, today)
-  await createRecurring({ type: 'expense', amount: 50_000, accountId: tunai.id, categoryId: sedekah, note: 'Infak Jumat', frequency: 'weekly', interval: 1, anchorDate: addDays(p0, 4) }, today)
+  await createRecurring({ type: 'expense', amount: 50_000, accountId: tunai.id, categoryId: sedekah, note: 'Infak Jumat', frequency: 'weekly', interval: 1, anchorDate: addDays(p0, (4 - weekdayMon0(p0) + 7) % 7) }, today)
 
   const MEALS = ['Nasi padang', 'Kopi Kenangan', 'Bakso', 'Makan siang', 'Soto ayam', 'Martabak', 'Mie ayam', '', '', '']
   for (let d = start; d <= today; d = addDays(d, 1)) {
@@ -76,7 +76,7 @@ export async function seedDemo(options: { empty?: boolean; pin?: boolean } = {})
         type: 'expense',
         amount: round(15_000 + r() * 55_000),
         date: d,
-        accountId: r() < 0.55 ? tunai.id : ewallet.id,
+        accountId: r() < 0.7 ? tunai.id : ewallet.id,
         categoryId: makan,
         note: pick(MEALS) || undefined,
       })
@@ -93,9 +93,9 @@ export async function seedDemo(options: { empty?: boolean; pin?: boolean } = {})
       await addTransaction({ type: 'expense', amount: 452_000, date: d, accountId: bank.id, categoryId: tagihan, note: 'Listrik PLN' })
       await addTransaction({ type: 'expense', amount: 385_000, date: d, accountId: bank.id, categoryId: tagihan, note: 'IndiHome' })
     }
-    if (d.endsWith('-12') || d.endsWith('-27')) await addTransfer({ fromAccountId: bank.id, toAccountId: ewallet.id, amount: 400_000, date: d })
+    if (d.endsWith('-12') || d.endsWith('-27')) await addTransfer({ fromAccountId: bank.id, toAccountId: ewallet.id, amount: 750_000, date: d })
     if (d.endsWith('-02') || d.endsWith('-17')) await addTransfer({ fromAccountId: bank.id, toAccountId: tunai.id, amount: 1_000_000, date: d })
-    if (d.endsWith('-20')) await addTransfer({ fromAccountId: bank.id, toAccountId: cc.id, amount: 1_500_000, date: d, note: 'Bayar tagihan kartu' })
+    if (d.endsWith('-20')) await addTransfer({ fromAccountId: bank.id, toAccountId: cc.id, amount: 1_100_000, date: d, note: 'Bayar tagihan kartu' })
     if (r() < 0.03) await addTransaction({ type: 'income', amount: round(750_000 + r() * 2_000_000, 50_000), date: d, accountId: bank.id, categoryId: usaha, note: 'Proyek desain' })
   }
   // Transaksi hari ini yang khas + satu terjadwal.

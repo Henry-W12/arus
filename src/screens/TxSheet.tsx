@@ -415,8 +415,8 @@ function TxSheetBody({ open, tx, startMode, defaultAccount, accounts, categories
             </Chip>
           )}
           {isEdit && !isAdjust && mode !== 'transfer' && categoryId && (
-            <Chip icon="star" onClick={makeFavorite}>
-              Jadikan favorit
+            <Chip icon="star" onClick={makeFavorite} className="is-icon-only" aria-label="Jadikan favorit" title="Jadikan favorit">
+              {null}
             </Chip>
           )}
         </div>

@@ -3,7 +3,7 @@
  * banner, sheet pemilih (akun, tanggal, kategori, pilihan), sheet nominal, grid ikon/warna.
  */
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import type { Account, Category, CategoryKind, ColorToken, ID, LocalDate, PeriodKey, Transaction } from '../db/schema'
+import type { Account, Category, CategoryKind, ColorToken, IconName as EntityIcon, ID, LocalDate, PeriodKey, Transaction } from '../db/schema'
 import { COLOR_TOKENS } from '../db/iconIds'
 import { deleteTransaction, restoreTransaction } from '../db/repo'
 import { transactionEffect } from '../lib/balances'
@@ -49,6 +49,17 @@ export function useSheetState<T>() {
   const show = useCallback((data: T) => setS({ open: true, data }), [])
   const hide = useCallback(() => setS((p) => ({ ...p, open: false })), [])
   return { open: s.open, data: s.data, show, hide }
+}
+
+/** Nomor sesi yang naik setiap kali `open` berubah ke true (pakai sebagai `key` untuk reset form). */
+export function useOpenSession(open: boolean): number {
+  const [session, setSession] = useState(0)
+  const [was, setWas] = useState(open)
+  if (open !== was) {
+    setWas(open)
+    if (open) setSession((s) => s + 1)
+  }
+  return session
 }
 
 /* ------------------------------------------------------------ transaksi */
@@ -718,7 +729,7 @@ export function shortDateLabel(date: LocalDate, today: LocalDate): string {
 
 /* ------------------------------------------------------------ ikon & warna */
 
-export function IconGrid({ icons, value, color, onChange }: { icons: readonly IconName[]; value: IconName; color: ColorToken; onChange: (i: IconName) => void }) {
+export function IconGrid({ icons, value, color, onChange }: { icons: readonly EntityIcon[]; value: EntityIcon; color: ColorToken; onChange: (i: EntityIcon) => void }) {
   return (
     <div className="s-icongrid" role="radiogroup" aria-label="Ikon">
       {icons.map((i) => (
