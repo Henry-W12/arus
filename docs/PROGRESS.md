@@ -7,7 +7,7 @@
 | 3a. Logika data | ✅ | src/db, src/lib, docs/API.md (144 tes vitest hijau) |
 | 3b. Fondasi UI + PWA | ✅ | src/ui, src/styles, public/ (ikon, _headers), vite.config.ts, docs/screens |
 | 3c. Layar | ✅ semua layar v1 + onboarding + kunci PIN; screenshot light/dark `docs/screens/app-*.png` (+ 375×667 untuk sheet input) | src/screens |
-| 4. QA | ⬜ | docs/QA_REPORT.md |
+| 4. QA | ✅ 97 tes e2e Playwright (`npm run e2e`, WebKit 390×844 & 375×667, Chromium offline); AC: 83 lulus, 2 gagal, 5 sebagian, 6 tidak dapat diuji e2e; bug 1 Kritis, 1 Tinggi, 4 Sedang, 7 Rendah | docs/QA_REPORT.md, e2e/, docs/screens/qa-*.png |
 | 5. Perbaikan & finalisasi | ⬜ | |
 
 ## Catatan lanjutan

@@ -338,3 +338,16 @@ test('Konsistensi: total saldo Transaksi = total saldo Akun = Σ saldo akun', as
   expect(t2).toBe(t1)
   expect(rows.length).toBeGreaterThanOrEqual(3)
 })
+
+// BUG-05: deltaRatio membagi dengan nilai sebelumnya yang negatif → arah/warna delta Selisih terbalik.
+test('BUG-05 · delta Selisih: defisit mengecil (−200rb → −100rb) harus tampil sebagai perbaikan', async ({ page }) => {
+  const d = await boot(page)
+  await seedTx(page, d, [
+    { amount: 200000, date: '2026-10-10' },
+    { amount: 100000, date: '2026-11-10' },
+  ], '/ringkasan')
+  const delta = page.locator('.s-stats__netval .s-delta')
+  await expect(delta).toBeVisible()
+  console.log('[ukur] delta selisih:', await delta.innerText(), await delta.getAttribute('class'))
+  await expect(delta).toHaveClass(/is-good/)
+})

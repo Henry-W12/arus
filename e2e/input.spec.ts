@@ -30,6 +30,7 @@ test('AC-IN-01 · cold start openToAdd=true membuka sheet input (Keluar, akun te
   await page.goto('/')
   await expect(txSheet(page)).toBeVisible()
   const ms = Date.now() - t0
+  console.log(`[ukur] AC-IN-01 goto → sheet terlihat: ${ms} ms`)
   expect(ms, `sheet terbuka dalam ${ms} ms`).toBeLessThan(1500)
   await expect(page.locator('.tx-sheet__seg [role=radio][aria-checked=true]')).toHaveText('Keluar')
   await expect(page.locator('.tx-sheet__ctx')).toContainText('Rekening Bank')

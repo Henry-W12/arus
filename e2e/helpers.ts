@@ -286,5 +286,5 @@ export async function swipeLeft(page: Page, row: Locator, dist = 140) {
 }
 
 export async function shot(page: Page, name: string) {
-  await page.screenshot({ path: `docs/screens/qa-${name}.png` })
+  await page.screenshot({ path: `docs/screens/qa-${name}.png`, scale: 'css' })
 }

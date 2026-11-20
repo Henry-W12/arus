@@ -26,5 +26,9 @@ Aplikasi pencatat keuangan pribadi, dipasang di iPhone lewat Safari → "Add to 
 - Screenshot layar: `npm run dev` lalu `node scripts/screens.mjs [light|dark|all] [filter]` → `docs/screens/app-*.png`. Data demo `scripts/demo-seed.ts` hanya untuk skrip (dimuat via dev server).
 - Nav/tab bar sengaja opak (`var(--bg)`): di WebKit Windows backdrop-filter tidak bekerja dan teks di belakang tembus terbaca.
 
+## E2E (fase 4)
+- `npm run e2e` (Playwright, build produksi + `vite preview` :4173). Project `iphone` (WebKit 390×844), `iphone-se` (`small.spec`), `chromium-offline` (WebKit Playwright di Windows tidak menjalankan SW).
+- Data uji ditulis langsung ke IndexedDB lewat `e2e/helpers.ts` (`boot`, `seedTx`, `putRows`) lalu reload; jam dipalsukan `page.clock` (default 20 Nov 2026 10:00 WIB). Tes yang gagal karena bug diberi ID `BUG-xx` dari `docs/QA_REPORT.md`.
+
 ## Aturan
 - `node_modules`, `dist`, `.env`, data/backup tidak masuk repo.
