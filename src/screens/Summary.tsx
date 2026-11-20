@@ -47,7 +47,7 @@ export function SummaryScreen() {
   return (
     <Screen title="Ringkasan">
       <div {...swipe}>
-        <PeriodNav period={data.period} onChange={setKey} min={data.firstKey} max={current.key} showRange={settings.periodStartDay !== 1} />
+        {!isEmptyDb && <PeriodNav period={data.period} onChange={setKey} min={data.firstKey} max={current.key} showRange={settings.periodStartDay !== 1} />}
 
         {isEmptyDb ? (
           <EmptyState

@@ -17,6 +17,7 @@ function buildHash(): string {
 const BG_LIGHT = '#F5F4F0'
 
 export default defineConfig({
+  build: { chunkSizeWarningLimit: 600 },
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     __APP_BUILD__: JSON.stringify(buildHash()),

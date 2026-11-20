@@ -18,8 +18,8 @@ export function FavoritesScreen() {
 
   const sub = (t: Template) => {
     const cat = lookup?.categories.get(t.categoryId)?.name ?? ''
-    const acc = t.accountId ? lookup?.accounts.get(t.accountId)?.name : 'akun default'
-    return `${cat} · ${acc}`
+    const acc = t.accountId ? lookup?.accounts.get(t.accountId)?.name : undefined
+    return acc ? `${cat} · ${acc}` : cat
   }
 
   return (

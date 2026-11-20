@@ -8,6 +8,9 @@ import { mkdirSync } from 'node:fs'
 
 const BASE = process.env.ARUS_URL ?? 'http://localhost:5173'
 const OUT = 'docs/screens'
+// ARUS_VIEWPORT=375x667 → ukuran lain (nama file diberi akhiran -375x667).
+const [VW, VH] = (process.env.ARUS_VIEWPORT ?? '390x844').split('x').map(Number)
+const SUFFIX = process.env.ARUS_VIEWPORT ? `-${process.env.ARUS_VIEWPORT}` : ''
 const [themeArg = 'all', ...filters] = process.argv.slice(2)
 const themes = themeArg === 'all' ? ['light', 'dark'] : [themeArg]
 mkdirSync(OUT, { recursive: true })
@@ -118,22 +121,22 @@ const SHOTS = [
 
 const browser = await webkit.launch()
 for (const theme of themes) {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, colorScheme: theme, locale: 'id-ID', timezoneId: 'Asia/Jakarta' })
+  const ctx = await browser.newContext({ viewport: { width: VW, height: VH }, deviceScaleFactor: 3, colorScheme: theme, locale: 'id-ID', timezoneId: 'Asia/Jakarta' })
   const page = await ctx.newPage()
   page.on('pageerror', (e) => console.error(`[${theme}] pageerror:`, e.message))
   page.on('console', (m) => m.type() === 'error' && console.error(`[${theme}] console:`, m.text()))
 
   // Pertama kali dibuka: onboarding.
   await open(page, '/')
-  if (want('onboarding')) await page.screenshot({ path: `${OUT}/app-onboarding-${theme}.png` })
+  if (want('onboarding')) await page.screenshot({ path: `${OUT}/app-onboarding-${theme}${SUFFIX}.png` })
 
   await seed(page)
   for (const [name, path, act] of SHOTS) {
     if (!want(name)) continue
     await open(page, path)
     if (act) await act(page)
-    await page.screenshot({ path: `${OUT}/app-${name}-${theme}.png` })
-    console.log(`app-${name}-${theme}.png`)
+    await page.screenshot({ path: `${OUT}/app-${name}-${theme}${SUFFIX}.png` })
+    console.log(`app-${name}-${theme}${SUFFIX}.png`)
   }
 
   if (want('lock')) {
@@ -142,18 +145,18 @@ for (const theme of themes) {
     await page.keyboard.press('1')
     await page.keyboard.press('2')
     await pause(200)
-    await page.screenshot({ path: `${OUT}/app-lock-${theme}.png` })
-    console.log(`app-lock-${theme}.png`)
+    await page.screenshot({ path: `${OUT}/app-lock-${theme}${SUFFIX}.png` })
+    console.log(`app-lock-${theme}${SUFFIX}.png`)
   }
   if (want('empty')) {
     await seed(page, { empty: true })
     await open(page, '/')
-    await page.screenshot({ path: `${OUT}/app-empty-${theme}.png` })
+    await page.screenshot({ path: `${OUT}/app-empty-${theme}${SUFFIX}.png` })
     await open(page, '/ringkasan')
-    await page.screenshot({ path: `${OUT}/app-empty-summary-${theme}.png` })
+    await page.screenshot({ path: `${OUT}/app-empty-summary-${theme}${SUFFIX}.png` })
     await open(page, '/anggaran')
-    await page.screenshot({ path: `${OUT}/app-empty-budgets-${theme}.png` })
-    console.log(`app-empty-*-${theme}.png`)
+    await page.screenshot({ path: `${OUT}/app-empty-budgets-${theme}${SUFFIX}.png` })
+    console.log(`app-empty-*-${theme}${SUFFIX}.png`)
   }
   await ctx.close()
 }

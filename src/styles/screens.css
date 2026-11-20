@@ -744,3 +744,8 @@
 .s-pinflow__icon { color: var(--accent); margin-bottom: var(--s-4); }
 .s-icongrid__cell:not(.is-selected) .ui-cat-icon { background: transparent; color: var(--ink-2); }
 .ui-seg__item:focus-visible { outline-offset: -2px; border-radius: 7px; }
+@media (max-height: 699px) {
+  .tx-sheet__amount { min-height: 64px; padding-top: var(--s-1); padding-bottom: var(--s-1); }
+  .tx-sheet__ctx, .tx-sheet__favs { padding-bottom: var(--s-3); }
+  .tx-sheet .ui-sheet__footer { padding-top: var(--s-2); }
+}

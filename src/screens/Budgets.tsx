@@ -31,7 +31,7 @@ export function BudgetsScreen() {
     return first && settings ? periodOf(first, settings.periodStartDay).key : null
   }, [all, settings])
   const setKey = (k: PeriodKey) => {
-    if (!current || k > current.key || (minKey && k < minKey && k < current.key)) return
+    if (!current || k > current.key || k < (minKey ?? current.key)) return
     router.setQuery({ p: k === current.key ? null : k }, { replace: true })
   }
   const swipe = useHorizontalSwipe((dir) => key && setKey(shiftPeriod(key, dir)))
@@ -76,7 +76,7 @@ export function BudgetsScreen() {
       }
     >
       <div {...swipe}>
-        <PeriodNav period={data.period} onChange={setKey} min={minKey} max={current.key} showRange={settings.periodStartDay !== 1} />
+        <PeriodNav period={data.period} onChange={setKey} min={minKey ?? current.key} max={current.key} showRange={settings.periodStartDay !== 1} />
 
         {editing ? (
           <>

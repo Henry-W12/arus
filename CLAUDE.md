@@ -21,5 +21,10 @@ Aplikasi pencatat keuangan pribadi, dipasang di iPhone lewat Safari → "Add to 
 - Tes: `npm test` (vitest, `vitest.config.ts`, TZ dipaksa Asia/Jakarta, fake-indexeddb). Tes penjaga melarang `toISOString()` di `src/`.
 - Jebakan: tool Write/heredoc mengubah escape unicode (backslash-u) jadi karakter asli. Setelah menulis NBSP/U+2212/BOM di kode, cek dengan grep dan perbaiki lewat skrip (`String.fromCharCode(92)`).
 
+## Layar (fase 3c)
+- `src/screens/` (+ `settings/`), gaya `src/styles/screens.css` (prefiks `.s-`/`.tx-`), helper bersama `screens/shared.tsx`, state lintas layar `screens/store.ts`. Sheet input = `?sheet=add|tx` (dirender di `App.tsx`).
+- Screenshot layar: `npm run dev` lalu `node scripts/screens.mjs [light|dark|all] [filter]` → `docs/screens/app-*.png`. Data demo `scripts/demo-seed.ts` hanya untuk skrip (dimuat via dev server).
+- Nav/tab bar sengaja opak (`var(--bg)`): di WebKit Windows backdrop-filter tidak bekerja dan teks di belakang tembus terbaca.
+
 ## Aturan
 - `node_modules`, `dist`, `.env`, data/backup tidak masuk repo.

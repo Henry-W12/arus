@@ -16,6 +16,7 @@ import { formatIDR } from '../../lib/money'
 import { countDue, describeSchedule } from '../../lib/recurring'
 import {
   ActionSheet,
+  AmountText,
   BottomSheet,
   Button,
   CategoryIcon,
@@ -81,9 +82,9 @@ export function RecurringScreen() {
                         />
                       }
                       title={title}
-                      subtitle={`${formatIDR(r.amount)} · ${describeSchedule(r)}`}
-                      trailing={r.active ? <span className="s-next">{formatDateMedium(r.nextDate).replace(/ \d{4}$/, '')}</span> : <span className="s-badge">Dijeda</span>}
-                      trailingSub={r.active ? 'berikutnya' : undefined}
+                      subtitle={describeSchedule(r)}
+                      trailing={<AmountText value={r.amount} kind={r.type === 'transfer' ? 'transfer' : r.type} muted={!r.active} />}
+                      trailingSub={r.active ? formatDateMedium(r.nextDate).replace(/ \d{4}$/, '') : 'Dijeda'}
                       onClick={() => setEdit({ open: true, rule: r })}
                     />
                   )
