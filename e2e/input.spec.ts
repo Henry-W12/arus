@@ -315,3 +315,22 @@ test('Tombol back browser menutup sheet tanpa meninggalkan app', async ({ page }
 void rp
 void dumpDb
 void installClock
+
+// BUG-02 (Kritis): setelah toast "Tersimpan" hilang sendiri (5 dtk), elemen toast tetap ada (is-leaving, opacity 0,
+// pointer-events auto) di atas baris bawah keypad. Tap ⌫ di sheet berikutnya mengenai "Urungkan" → transaksi terhapus diam-diam.
+test('BUG-02 · toast yang sudah hilang tidak boleh menangkap tap (⌫ tidak boleh memicu Urungkan)', async ({ page }) => {
+  await boot(page, { time: null })
+  await openAdd(page)
+  await keys(page, ['1', '000'])
+  await catCell(page, 'Makan & Minum').click()
+  await expect(txSheet(page)).toBeHidden()
+  await page.waitForTimeout(6000)
+  await expect(page.locator('.ui-toast'), 'toast harus sudah di-unmount setelah 5 dtk').toHaveCount(0)
+  await page.locator('.ui-fab').dispatchEvent('click')
+  await expect(txSheet(page)).toBeVisible()
+  await page.waitForTimeout(400)
+  const back = (await keypad(page).getByRole('button', { name: 'Hapus satu digit' }).boundingBox())!
+  await page.mouse.click(back.x + back.width / 2, back.y + back.height / 2)
+  await page.waitForTimeout(400)
+  expect(await transactions(page), 'transaksi tersimpan hilang karena tap ⌫ mengenai Urungkan').toHaveLength(1)
+})
