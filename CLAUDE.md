@@ -15,5 +15,10 @@ Aplikasi pencatat keuangan pribadi, dipasang di iPhone lewat Safari → "Add to 
 - Saldo akun dihitung dari transaksi (tidak disimpan). Nominal = integer Rupiah. Tanggal bisnis = string lokal `YYYY-MM-DD`. Jangan pernah memakai `toISOString()` untuk tanggal (bisa bergeser ke kemarin di WIB).
 - Router: History API buatan sendiri (tanpa library). Chart: SVG buatan sendiri.
 
+## Lapisan data
+- Fungsi murni di `src/lib/`, Dexie + semua tulis di `src/db/` (`repo.ts`). Layar memakai hooks `src/lib/hooks.ts`; referensi API di `docs/API.md`.
+- Tes: `npm test` (vitest, `vitest.config.ts`, TZ dipaksa Asia/Jakarta, fake-indexeddb). Tes penjaga melarang `toISOString()` di `src/`.
+- Jebakan: tool Write/heredoc mengubah escape unicode (backslash-u) jadi karakter asli. Setelah menulis NBSP/U+2212/BOM di kode, cek dengan grep dan perbaiki lewat skrip (`String.fromCharCode(92)`).
+
 ## Aturan
 - `node_modules`, `dist`, `.env`, data/backup tidak masuk repo.
