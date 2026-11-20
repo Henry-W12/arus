@@ -123,3 +123,42 @@ Lainnya: `ensurePersistentStorage()`, `getStorageEstimate()`, `formatBytes(n)` (
 
 ## Settings (`DEFAULT_SETTINGS`, schema.ts)
 `periodStartDay` (1–28, di-clamp), `theme`, `textScale`, `defaultAccount`, `lastAccountId`, `openToAdd`, `backupReminderDays`, `lastBackupAt`, `txCountAtLastBackup`, `backupReminderSnoozedUntil`, `persistGranted`, `pin`, `pinLockState`, `autoLockMinutes`, `seededAt`, `installHintDismissedAt`. Key khusus perangkat (`DEVICE_ONLY_SETTING_KEYS`) tidak ikut backup.
+
+## Ikon (UI, `src/ui/icons.tsx`)
+- `<Icon name size? filled? strokeWidth? label?>` — viewBox 24, stroke 1.5 (1.75 bila size ≤ 18). `filled` = varian tab aktif (bentuk utama isi 12%). Tanpa `label` ikon dianggap dekoratif (`aria-hidden`).
+- Semua ID di `src/db/iconIds.ts` (UI + entity) sudah punya glyph. Tambahan UI: `chevron-up, minus, eye, pencil, refresh, sun, moon, star`. Tambahan kategori (konteks Indonesia, belum masuk `ENTITY_ICON_IDS` — tambahkan di data bila ingin bisa dipilih): `motorbike` (ojek), `train` (KRL/MRT), `droplet` (PDAM), `flame` (gas/LPG), `tv` (langganan), `laptop`, `scissors` (salon/potong rambut), `shield` (asuransi), `angpao`, `mosque` (ibadah).
+- `CATEGORY_ICON_NAMES` (50, urut untuk grid pemilih), `ICON_NAMES`, `isIconName()`, `<ArusMark size>` (logo; path sama dengan `public/icon.svg`).
+- Pemetaan konteks Indonesia: listrik/PLN `bolt`, pulsa `phone`, internet `wifi`, THR/bonus `gift`, zakat/sedekah `hand-heart`, e-wallet `smartphone-wallet`, kartu kredit `card`, tunai `cash`, bank `bank`, lain-lain `dots`.
+
+## Komponen UI (`src/ui`, impor dari `./ui`)
+Gaya: `src/styles/tokens.css` (satu-satunya tempat hex), `base.css` (reset, `.num`, `.t-*`, `.ink-*`, `.sr-only`), `components.css` (kelas `.ui-*`). Tema: `applyTheme('system'|'light'|'dark')`, `applyTextScale('standard'|'large'|'larger')` (`src/ui/theme.ts`). Root app wajib: `useViewportVars()` (menulis `--vv-h`, `--kb`, kelas `kb-open`), `<RouterProvider>`, `<ToastProvider>`, `<UpdatePrompt blocked?>`.
+
+| Komponen | Props inti |
+|---|---|
+| `Screen` | `title, large?=true, back?{label,onBack}, actions?, center?, withTabBar?=true` — nav bar iOS (Large Title → inline > 40 px), area scroll, swipe tepi kiri → back. |
+| `TabBar` | `hidden?, showAdd?=true, onAdd?, active?` — 4 tab (rute dari `ROUTES`), FAB 56 px bila `onAdd`. Menulis `--chrome-bottom` agar toast duduk di atas tab bar + FAB. Otomatis tersembunyi saat keyboard aktif. |
+| `BottomSheet` | `open, onClose, children, detent?'full'|'auto', title?, ariaLabel?, headerLeft/Center/Right?, footer?, instant?, initialFocus?, disableDrag?` — portal, drag grabber/header (> 25% atau > 0,5 px/ms → tutup), fokus terperangkap, Escape, latar `inert`, posisi di atas keyboard iOS. Bila `onClose` diabaikan induk (mis. konfirmasi), panel kembali sendiri. |
+| `ConfirmDialog` | `open, title?, message?, confirmLabel, cancelLabel?='Batal', destructive?=true, onConfirm, onCancel` — action sheet iOS. |
+| `Keypad` | `value, onChange, maxDigits?=12, onReject?, variant?'amount'|'pin', onKey?, submit?{label?,disabled?,onSubmit,hint?}, captureKeyboard?, onEscape?, disabled?` — respons `pointerdown`, tahan ⌫ 500 ms = kosongkan, VoiceOver via click `detail===0`. `applyKey(value,key,max)` murni (null = ditolak). |
+| `AmountDisplay` | `value, mode?'expense'|'income'|'transfer', shakeKey?` — "Rp" + angka hero, auto-shrink 40/32 px, digit masuk beranimasi; naikkan `shakeKey` untuk geleng. |
+| `AmountText` | `value, kind?'expense'|'income'|'transfer'|'balance'|'plain', size?'body'|'title'|'amount-l'|'hero'|'inherit', short?, muted?` — tanda (U+2212) & warna sesuai DESIGN; expense/income/transfer: kirim nilai absolut. |
+| `ListGroup` | `inset?=true` — grup `surface` r-14. |
+| `ListRow` | `title, subtitle?, leading?, trailing?, trailingSub?, chevron?, onClick?, onDelete?, deleteLabel?, highlight?, subtitleIcon?, disabled?` — 60/48 px, swipe kiri → Hapus 88 px, swipe > 60% → hapus langsung, `highlight` = sorot 1,2 dtk (ganti `key` untuk memicu ulang). |
+| `SectionHeader` | `title, trailing?, sticky?, action?{label,onClick}` — header hari: `sticky`; **bungkus header + grupnya dalam satu `<section>`** agar header lepas saat hari berganti. |
+| `CategoryIcon` | `icon, color (1–12 | 'c1'–'c12' | 'neutral'), size?32|40|44|56` |
+| `CategoryCell` | `icon, color, label, selected?, recent?, onClick?` — taruh di `<div className="ui-cat-grid">` (4 kolom). |
+| `SegmentedControl` | `options[{value,label,disabled?}], value, onChange, ariaLabel, block?=true` — radiogroup, panah kiri/kanan. |
+| `Button` | `variant?'primary'|'secondary'|'neutral'|'plain'|'destructive', size?'lg'|'md'|'sm', block?, icon?` + atribut button. Kelas `ui-btn--pill` untuk tombol chip besar. |
+| `IconButton` | `icon, label (wajib), size?=22, tone?` — target 44×44. |
+| `Chip` | `icon?, menu?, active?` — 32 px. |
+| `TextField` | `value, onChange(string), label?, icon?, clearable?, hint?, error?` + atribut input (font ≥ 16 px). |
+| `Switch` | `checked, onChange, label? | ariaLabel, disabled?` |
+| `EmptyState` | `icon, title, description?, action?{label,onClick}` |
+| `ProgressBar` | `value, max, today? (0–1), thickness?4|6, status?, ariaLabel?` — status otomatis `budgetStatus()` (< 80% ok, 80–100% warning, > 100% over). |
+| `DonutChart` | `segments[{id,value,color,label?}], selectedId?, onSelect?, centerValue?, centerLabel?, ariaLabel, size?=184` — urutkan terbesar dulu; nominal tengah mengecil otomatis. |
+| Toast | `useToast().show({message, action?{label,onAction}, duration?=5000 (Infinity = persisten), id?, tone?'error'})`, `.dismiss(id?)`. |
+| `UpdatePrompt` | `blocked?` — SW `prompt` + toast "Versi baru tersedia · Muat ulang", `registration.update()` saat kembali terlihat (maks 1×/30 menit). `checkForUpdate()` untuk tombol "Periksa pembaruan". |
+| Router | `useRouter() → {path, query, navigate(to,{replace?,state?}), back(fallback?), canGoBack, setQuery(patch)}`, `useParams(pattern)`, `matchPath`, `useSheet() → {sheet, params, open(name, extra?), close()}` (sheet = `?sheet=…`; back menutup sheet), `<Link to>`, `ROUTES`, `tabForPath`, `useEdgeSwipeBack`. |
+| Format | `formatRp`, `formatShort`, `formatDigits`, `MINUS` (ringan, untuk komponen; domain memakai `src/lib/money`). |
+
+Dev: `/_gallery` (hanya `npm run dev`) menampilkan semua komponen; `?theme=light|dark&open=input|auto|confirm|toast|update`. Screenshot iPhone 390×844 @3x ada di `docs/screens/`.

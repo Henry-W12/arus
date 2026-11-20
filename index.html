@@ -1,10 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#F5F4F0" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0B0C0D" media="(prefers-color-scheme: dark)" />
+    <meta name="description" content="Arus — pencatat keuangan pribadi. Semua data hanya ada di perangkat ini." />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Arus" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <title>Arus</title>
+    <style>
+      /* Latar sebelum CSS app dimuat — cegah kilatan putih di dark mode. */
+      html, body { background: #F5F4F0; }
+      @media (prefers-color-scheme: dark) { html, body { background: #0B0C0D; } }
+    </style>
   </head>
   <body>
     <div id="root"></div>

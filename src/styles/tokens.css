@@ -1,0 +1,225 @@
+/*
+ * Arus — design tokens (sumber: docs/DESIGN.md).
+ * Satu-satunya file yang boleh berisi hex. Komponen hanya memakai var(--…).
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* 2.1 Warna semantik — light */
+  --bg: #F5F4F0;
+  --surface: #FFFFFF;
+  --surface-2: #EDECE7;
+  --surface-pressed: #E3E1DB;
+  --line: #E2E0DA;
+  --ink: #15171A;
+  --ink-2: #62666D;
+  --ink-3: #9EA1A6;
+  --accent: #0B6B5D;
+  --accent-soft: #0B6B5D1A;
+  --on-accent: #FFFFFF;
+  --positive: var(--accent);
+  --negative: #C23B22;
+  --negative-soft: #C23B221A;
+  --warning: #9A6200;
+  --inverse-bg: #1B1D20;
+  --inverse-ink: #F2F1ED;
+  --inverse-accent: #6FD6C2;
+  --scrim: rgba(10, 12, 14, .32);
+  --thumb: var(--surface);
+  --switch-thumb: #FFFFFF;
+  --e-switch: 0 3px 8px rgba(20, 22, 25, .15), 0 1px 1px rgba(20, 22, 25, .06);
+
+  /* 2.2 Warna kategori — light */
+  --c1: #B8562F;
+  --c2: #3A64A8;
+  --c3: #5F7F32;
+  --c4: #A97813;
+  --c5: #80476F;
+  --c6: #B4465E;
+  --c7: #4D57A6;
+  --c8: #23827A;
+  --c9: #8E5E33;
+  --c10: #527F5E;
+  --c11: #33748F;
+  --c12: #6F737A;
+  --cat-soft: 14%;
+
+  /* 10. Identitas (sama di kedua tema) */
+  --brand-bg: #0F1513;
+  --brand-mark: #4CC3AE;
+
+  /* 3. Tipografi */
+  --font-text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+  --font-rounded: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
+  --text-scale: 1;
+
+  --t-hero: 600 3rem/3.25rem var(--font-rounded);
+  --t-hero-ls: -0.02em;
+  --t-amount-l: 600 2.125rem/2.5rem var(--font-rounded);
+  --t-amount-l-ls: -0.015em;
+  --t-large-title: 700 2.125rem/2.5625rem var(--font-text);
+  --t-large-title-ls: -0.012em;
+  --t-title: 600 1.375rem/1.75rem var(--font-text);
+  --t-title-ls: -0.01em;
+  --t-headline: 600 1.0625rem/1.375rem var(--font-text);
+  --t-headline-ls: -0.01em;
+  --t-body: 400 1.0625rem/1.375rem var(--font-text);
+  --t-body-ls: -0.01em;
+  --t-callout: 400 1rem/1.3125rem var(--font-text);
+  --t-callout-ls: -0.005em;
+  --t-subhead: 400 0.9375rem/1.25rem var(--font-text);
+  --t-subhead-ls: 0;
+  --t-footnote: 400 0.8125rem/1.125rem var(--font-text);
+  --t-footnote-ls: 0;
+  --t-caption: 500 0.6875rem/0.8125rem var(--font-text);
+  --t-caption-ls: 0.01em;
+  --t-key: 500 1.75rem/2rem var(--font-rounded);
+  --t-key-ls: 0;
+
+  /* 4. Spasi */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --gutter: 16px;
+
+  /* Radius */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-sheet: 24px;
+  --r-full: 999px;
+
+  --hairline: 0.5px solid var(--line);
+
+  /* Elevasi (light saja) */
+  --e-float: 0 1px 2px rgba(20, 22, 25, .06), 0 8px 24px rgba(20, 22, 25, .10);
+  --e-thumb: 0 1px 3px rgba(20, 22, 25, .12), 0 0 0 .5px rgba(20, 22, 25, .04);
+
+  /* Tinggi tetap */
+  --h-nav: 44px;
+  --h-tabbar: 49px;
+  --h-row: 60px;
+  --h-row-compact: 48px;
+  --h-key: 54px;
+  --content-max: 560px;
+
+  /* 8. Motion */
+  --m-instant: 80ms;
+  --m-quick: 160ms;
+  --m-base: 220ms;
+  --m-sheet: 380ms;
+  --m-chart: 500ms;
+  --ease-out: ease-out;
+  --ease-std: cubic-bezier(.2, .8, .2, 1);
+  --ease-sheet: cubic-bezier(.32, .72, 0, 1);
+
+  /* Safe area */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
+/* Dark: tanpa bayangan, permukaan lebih terang per elevasi. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B0C0D;
+    --surface: #151718;
+    --surface-2: #1E2022;
+    --surface-pressed: #2A2D30;
+    --line: #26292B;
+    --ink: #F2F1ED;
+    --ink-2: #A1A5AB;
+    --ink-3: #6A6E74;
+    --accent: #4CC3AE;
+    --accent-soft: #4CC3AE24;
+    --on-accent: #06231E;
+    --negative: #FF7A63;
+    --negative-soft: #FF7A6324;
+    --warning: #F2B33D;
+    --inverse-bg: #F2F1ED;
+    --inverse-ink: #15171A;
+    --inverse-accent: #0B6B5D;
+    --scrim: rgba(0, 0, 0, .56);
+    --thumb: #3A3D40;
+    --c1: #E08862;
+    --c2: #82A6DE;
+    --c3: #A0BE6C;
+    --c4: #E2B455;
+    --c5: #C690B9;
+    --c6: #E68C9F;
+    --c7: #959CE0;
+    --c8: #6ECAC1;
+    --c9: #CC9C6E;
+    --c10: #96C2A1;
+    --c11: #7DB7D1;
+    --c12: #A5A9AF;
+    --cat-soft: 22%;
+    --e-float: none;
+    --e-thumb: none;
+    --e-switch: none;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0B0C0D;
+  --surface: #151718;
+  --surface-2: #1E2022;
+  --surface-pressed: #2A2D30;
+  --line: #26292B;
+  --ink: #F2F1ED;
+  --ink-2: #A1A5AB;
+  --ink-3: #6A6E74;
+  --accent: #4CC3AE;
+  --accent-soft: #4CC3AE24;
+  --on-accent: #06231E;
+  --negative: #FF7A63;
+  --negative-soft: #FF7A6324;
+  --warning: #F2B33D;
+  --inverse-bg: #F2F1ED;
+  --inverse-ink: #15171A;
+  --inverse-accent: #0B6B5D;
+  --scrim: rgba(0, 0, 0, .56);
+  --thumb: #3A3D40;
+  --c1: #E08862;
+  --c2: #82A6DE;
+  --c3: #A0BE6C;
+  --c4: #E2B455;
+  --c5: #C690B9;
+  --c6: #E68C9F;
+  --c7: #959CE0;
+  --c8: #6ECAC1;
+  --c9: #CC9C6E;
+  --c10: #96C2A1;
+  --c11: #7DB7D1;
+  --c12: #A5A9AF;
+  --cat-soft: 22%;
+  --e-float: none;
+  --e-thumb: none;
+  --e-switch: none;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+@media (min-width: 428px) {
+  :root {
+    --gutter: 20px;
+  }
+}
+
+@media (max-height: 699px) {
+  :root {
+    --h-key: 52px;
+  }
+}

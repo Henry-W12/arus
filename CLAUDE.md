@@ -14,6 +14,7 @@ Aplikasi pencatat keuangan pribadi, dipasang di iPhone lewat Safari → "Add to 
 - Nama app: **Arus**. Spesifikasi produk di `docs/PRD.md` (acceptance criteria AC-* untuk QA), visual di `docs/DESIGN.md` (semua warna/ukuran lewat token).
 - Saldo akun dihitung dari transaksi (tidak disimpan). Nominal = integer Rupiah. Tanggal bisnis = string lokal `YYYY-MM-DD`. Jangan pernah memakai `toISOString()` untuk tanggal (bisa bergeser ke kemarin di WIB).
 - Router: History API buatan sendiri (tanpa library). Chart: SVG buatan sendiri.
+- UI: komponen di `src/ui` (impor dari `./ui`, props di `docs/API.md`), CSS biasa berkelas `.ui-*` di `src/styles/` (tanpa Tailwind; hex hanya di `tokens.css`). Verifikasi visual: `npm run dev` → `/_gallery?theme=light|dark`, screenshot Playwright WebKit 390×844 @3x ke `docs/screens/`.
 
 ## Lapisan data
 - Fungsi murni di `src/lib/`, Dexie + semua tulis di `src/db/` (`repo.ts`). Layar memakai hooks `src/lib/hooks.ts`; referensi API di `docs/API.md`.

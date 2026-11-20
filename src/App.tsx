@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+/*
+ * Shell sementara (fase 3b). Layar sesungguhnya dibangun di fase 3c (src/screens).
+ */
+import { lazy, Suspense } from 'react'
+import { EmptyState, RouterProvider, Screen, TabBar, ToastProvider, UpdatePrompt, useRouter, useViewportVars, ROUTES } from './ui'
 
-function App() {
-  const [count, setCount] = useState(0)
+const Gallery = import.meta.env.DEV ? lazy(() => import('./ui/Gallery')) : null
 
+const TITLES: Record<string, string> = {
+  [ROUTES.transactions]: 'Transaksi',
+  [ROUTES.summary]: 'Ringkasan',
+  [ROUTES.budgets]: 'Anggaran',
+  [ROUTES.accounts]: 'Akun',
+}
+
+function Routes() {
+  const { path } = useRouter()
+  if (Gallery && path === ROUTES.gallery) {
+    return (
+      <Suspense fallback={null}>
+        <Gallery />
+      </Suspense>
+    )
+  }
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Screen title={TITLES[path] ?? 'Arus'}>
+        <EmptyState icon="list" title="Sedang disiapkan" description="Layar ini dibangun pada tahap berikutnya." />
+      </Screen>
+      <TabBar showAdd={false} />
     </>
   )
 }
 
-export default App
+export default function App() {
+  useViewportVars()
+  return (
+    <RouterProvider>
+      <ToastProvider>
+        <Routes />
+        <UpdatePrompt />
+      </ToastProvider>
+    </RouterProvider>
+  )
+}
