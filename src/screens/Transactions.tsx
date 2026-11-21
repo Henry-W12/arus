@@ -95,7 +95,14 @@ export function TransactionsScreen() {
   const ready = groups && lookup && bal
   return (
     <Screen title="Transaksi" actions={<IconButton icon="search" label="Cari transaksi" onClick={() => navigate('/cari')} />}>
-      <button type="button" className="s-hero" onClick={() => navigate('/akun')} aria-label="Total saldo, buka Akun">
+      {/* Selama data dimuat, nilai disembunyikan (bukan "Rp 0" palsu, BUG-08); tata letak tetap. */}
+      <button
+        type="button"
+        className={`s-hero${bal && totals ? '' : ' is-loading'}`}
+        onClick={() => navigate('/akun')}
+        aria-label="Total saldo, buka Akun"
+        aria-busy={!(bal && totals)}
+      >
         <span className="s-hero__label">Total saldo</span>
         <AmountText value={bal?.total ?? 0} kind="balance" size="amount-l" className="s-hero__value" />
         <span className="s-hero__line num">

@@ -467,7 +467,7 @@ export function AccountPickerSheet({
             key={a.id}
             leading={<CategoryIcon icon={a.icon} color={a.color} />}
             title={a.name}
-            subtitle={formatIDR(bal?.balances.get(a.id) ?? 0)}
+            subtitle={bal ? formatIDR(bal.balances.get(a.id) ?? 0) : undefined}
             disabled={a.id === exclude}
             trailing={a.id === value ? <Icon name="check" size={20} className="s-check" /> : undefined}
             onClick={() => onSelect(a.id)}
@@ -806,7 +806,7 @@ function TypeToConfirmBody({ message, word, confirmLabel, onConfirm }: { message
       <button
         type="button"
         className="ui-btn ui-btn--lg ui-btn--block s-danger-btn"
-        disabled={text.trim().toUpperCase() !== word || busy}
+        disabled={text.trim() !== word || busy} // persis huruf besar (BUG-11); keyboard iOS sudah autoCapitalize
         onClick={async () => {
           setBusy(true)
           try {

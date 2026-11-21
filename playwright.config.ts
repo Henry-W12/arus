@@ -40,13 +40,20 @@ export default defineConfig({
   projects: [
     {
       name: 'iphone',
-      testIgnore: ['**/offline.spec.ts', '**/small.spec.ts'],
+      testIgnore: ['**/offline.spec.ts', '**/small.spec.ts', '**/perf.spec.ts'],
       use: { ...common, browserName: 'webkit', viewport: { width: 390, height: 844 }, isMobile: true },
     },
     {
       name: 'iphone-se',
       testMatch: ['**/small.spec.ts'],
       use: { ...common, browserName: 'webkit', viewport: { width: 375, height: 667 }, isMobile: true },
+    },
+    {
+      // Ukuran waktu: berjalan terakhir & sendirian (setelah semua project lain selesai).
+      name: 'perf',
+      testMatch: ['**/perf.spec.ts'],
+      dependencies: ['iphone', 'iphone-se', 'chromium-offline'],
+      use: { ...common, browserName: 'webkit', viewport: { width: 390, height: 844 }, isMobile: true },
     },
     {
       name: 'chromium-offline',

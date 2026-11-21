@@ -13,6 +13,7 @@ Tes: `npm test`. Error dari repo dilempar sebagai `RepoError` (`src/lib/errors.t
 ```ts
 import { initDatabase } from './db/init';
 const { recurring } = await initDatabase();     // open + seed + runRecurring + storage.persist()
+// App memakai initDatabase(undefined, { runGenerator: false }) lalu runRecurring() setelah UI tampil.
 if (recurring.created) showBanner(`${recurring.created} transaksi berulang dicatat`); // filter: { recurringOnly: true, createdSince: recurring.since }
 ```
 Panggil juga `runRecurring()` saat `visibilitychange → visible` dan saat `useToday()` berganti. `onDatabaseVersionChange(cb)` (db.ts) → tampilkan "Muat ulang".

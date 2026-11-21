@@ -1,9 +1,9 @@
 /* Ringkasan (PRD §3.4): periode, tiga angka + delta, donat kategori, tren 6 periode. */
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import type { CategoryKind, PeriodKey } from '../db/schema'
 import { MONTHS_SHORT } from '../lib/dates'
 import { useCurrentPeriod, useLookup, usePeriodSummary, useSettings } from '../lib/hooks'
-import { formatIDRShort, formatPercent } from '../lib/money'
+import { formatIDR, formatIDRShort, formatPercent } from '../lib/money'
 import { formatPeriodLabel, shiftPeriod } from '../lib/period'
 import type { TrendPoint } from '../lib/summary'
 import { AmountText, CategoryIcon, DonutChart, EmptyState, Icon, Screen, SegmentedControl, useRouter, useSheet } from '../ui'
@@ -164,9 +164,15 @@ function Stat({ label, value, delta, good, kind }: { label: string; value: numbe
   return (
     <div className="s-stats__cell">
       <span className="s-stats__label">{label}</span>
-      <AmountText value={value} size="title" className={cx('s-stats__value', kind === 'income' && 'is-positive')} />
+      {/* --len: jumlah karakter "Rp 1.234.567" → ukuran huruf menyusut agar nominal 12 digit tetap utuh (BUG-07) */}
+      <AmountText
+        value={value}
+        size="title"
+        className={cx('s-stats__value', kind === 'income' && 'is-positive')}
+        style={{ '--len': formatIDR(value).length } as CSSProperties}
+      />
       <span className="s-stats__delta">
-        <Delta value={delta} good={good} /> <span className="ink-3">vs bln lalu</span>
+        <Delta value={delta} good={good} /> <span className="ink-2">vs bln lalu</span>
       </span>
     </div>
   )

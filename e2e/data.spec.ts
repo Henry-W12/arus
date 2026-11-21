@@ -12,11 +12,13 @@ async function forceDownload(page: Page) {
 
 async function richData(page: Page, d: Dump) {
   const now = Date.now()
-  await putRows(page, 'budgets', [{ id: 'b1', categoryId: d.categories[0].id, amount: 2000000, startPeriod: '2026-10', createdAt: now, updatedAt: now }])
-  await putRows(page, 'templates', [{ id: 't1', label: 'Kopi', type: 'expense', amount: 25000, categoryId: d.categories[0].id, sortOrder: 0, useCount: 3, createdAt: now, updatedAt: now }])
+  // Kategori dipilih per nama: urutan dump mengikuti UUID acak (dulu kadang kategori pemasukan → flaky).
+  const cat = (n: string) => d.categories.find((c) => c.name === n && c.kind === 'expense')!.id
+  await putRows(page, 'budgets', [{ id: 'b1', categoryId: cat('Makan & Minum'), amount: 2000000, startPeriod: '2026-10', createdAt: now, updatedAt: now }])
+  await putRows(page, 'templates', [{ id: 't1', label: 'Kopi', type: 'expense', amount: 25000, categoryId: cat('Makan & Minum'), sortOrder: 0, useCount: 3, createdAt: now, updatedAt: now }])
   await putRows(page, 'recurring', [
     {
-      id: 'r1', type: 'expense', amount: 2400000, accountId: d.accounts[1].id, categoryId: d.categories[4].id, note: 'Kos',
+      id: 'r1', type: 'expense', amount: 2400000, accountId: d.accounts[1].id, categoryId: cat('Tempat Tinggal'), note: 'Kos',
       frequency: 'monthly', interval: 1, anchorDate: '2026-12-01', generatedCount: 0, nextDate: '2026-12-01', active: 1, createdAt: now, updatedAt: now,
     },
   ])
@@ -68,7 +70,11 @@ test('AC-BK-02/04/10 · backup JSON → hapus semua → restore: semua tabel ide
   await expect(confirm).toBeDisabled()
   await sh.getByRole('textbox').fill('HAPU')
   await expect(confirm).toBeDisabled()
-  // Catatan: 'hapus' (huruf kecil) juga diterima — lihat QA_REPORT (BUG Rendah)
+  // BUG-11: huruf kecil/campuran tidak diterima — harus persis HAPUS
+  await sh.getByRole('textbox').fill('hapus')
+  await expect(confirm).toBeDisabled()
+  await sh.getByRole('textbox').fill('Hapus')
+  await expect(confirm).toBeDisabled()
   await sh.getByRole('textbox').fill('HAPUS')
   await confirm.click()
   await expect(page).toHaveURL(/\/$|\/\?/)

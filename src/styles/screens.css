@@ -35,6 +35,8 @@
   text-align: left;
 }
 .s-hero:active .s-hero__value { opacity: .6; }
+.s-hero.is-loading .s-hero__value,
+.s-hero.is-loading .s-hero__line { visibility: hidden; }
 .s-hero__label { font: var(--t-footnote); font-weight: 600; color: var(--ink-2); }
 .s-hero__value { display: block; margin-top: 2px; transition: opacity var(--m-quick) var(--ease-std); }
 .s-hero__line { font: var(--t-footnote); color: var(--ink-2); margin-top: var(--s-1); }
@@ -82,18 +84,19 @@
 .s-banner__body { flex: 1; min-width: 0; }
 .s-banner__text { font: var(--t-callout); letter-spacing: var(--t-callout-ls); color: var(--ink); }
 .s-banner__actions { display: flex; gap: var(--s-5); margin-top: var(--s-2); }
-.s-banner__btn { font: var(--t-subhead); font-weight: 600; color: var(--accent); min-height: 32px; }
+.s-banner__btn { position: relative; font: var(--t-subhead); font-weight: 600; color: var(--accent); min-height: 32px; }
+.s-banner__btn::after { content: ''; position: absolute; inset: -6px -8px; } /* area sentuh 44 */
 .s-banner__btn.is-muted { color: var(--ink-2); }
 .s-banner__btn:active { opacity: .5; }
 .s-banner__close {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 40px;
-  height: 40px;
+  top: 2px;
+  right: 2px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
 
 /* ---------- Daftar per hari ---------- */
@@ -202,7 +205,7 @@
 .s-picker > .ui-icon:last-child { color: var(--ink-3); }
 
 .s-suggest__label { font: var(--t-footnote); font-weight: 600; color: var(--ink-2); margin: 0 var(--s-1) var(--s-2); }
-.s-suggest__chips { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.s-suggest__chips { display: flex; flex-wrap: wrap; gap: var(--s-4) var(--s-2); } /* jarak baris ≥ 12 px: area sentuh chip (44) tidak bertumpuk */
 
 /* ---------- Sheet nominal ---------- */
 .s-amount-sheet__body { padding-top: var(--s-2); }
@@ -230,7 +233,7 @@
 .s-date__month { font: var(--t-headline); letter-spacing: var(--t-headline-ls); }
 .s-date__nav { display: flex; }
 .s-date__grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 2px; margin-top: var(--s-1); }
-.s-date__wd { font: var(--t-caption); color: var(--ink-3); text-align: center; padding: var(--s-1) 0 6px; }
+.s-date__wd { font: var(--t-caption); color: var(--ink-2); text-align: center; padding: var(--s-1) 0 6px; }
 .s-date__day {
   justify-self: center;
   width: 42px;
@@ -291,6 +294,7 @@
 .tx-sheet__ctx > :first-child { margin-left: auto; }
 .tx-sheet__ctx > :last-child { margin-right: auto; }
 .tx-sheet__ctx .ui-chip { flex: none; }
+.tx-sheet__ctx { padding-top: 6px; margin-top: -4px; } /* area sentuh chip (44) tidak terpotong overflow */
 .tx-sheet__note-chip .ui-chip__label { max-width: 104px; overflow: hidden; text-overflow: ellipsis; }
 .tx-sheet__favs { margin-top: calc(var(--s-2) * -1); }
 .tx-fav { flex: none; background: var(--accent-soft); color: var(--accent); }
@@ -304,6 +308,30 @@
 }
 .tx-sheet__hint--center { text-align: center; padding-bottom: var(--s-4); }
 .tx-sheet__transfer { flex: none; display: flex; flex-direction: column; gap: var(--s-3); padding-bottom: var(--s-2); }
+
+/* Landscape / viewport pendek (BUG-13): manifest meminta portrait, tetapi iOS tidak selalu menguncinya.
+ * Keypad pindah ke kolom kanan sehingga nominal, chip konteks, dan grid kategori tetap terlihat di kiri. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .tx-sheet .ui-sheet__panel {
+    max-width: min(100% - 2 * var(--s-4), 880px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .tx-sheet .ui-sheet__top { grid-column: 1 / -1; }
+  .tx-sheet .ui-sheet__body { grid-column: 1; grid-row: 2; }
+  .tx-sheet .ui-sheet__footer {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 0;
+    padding-top: 0;
+  }
+  .tx-sheet .ui-key { height: min(var(--h-key), calc((var(--vv-h, 100dvh) - 140px) / 4)); min-height: 44px; }
+  .tx-sheet__amount { flex: none; min-height: 72px; }
+}
 .tx-strip__label {
   display: block;
   font: var(--t-footnote);
@@ -455,6 +483,7 @@
 .tx-sheet__ctx { gap: 6px; padding-left: var(--s-3); padding-right: var(--s-3); }
 .tx-sheet__ctx .ui-chip { padding: 0 10px; }
 .tx-sheet__ctx .ui-chip.is-icon-only { padding: 0; width: 36px; justify-content: center; }
+.tx-sheet__ctx .ui-chip.is-icon-only::after { left: -4px; right: -4px; }
 .tx-sheet__ctx .ui-chip.is-icon-only .ui-chip__label { display: none; }
 
 /* ---------- Kartu umum ---------- */
@@ -476,7 +505,7 @@
   gap: var(--s-2);
   overflow-x: auto;
   scrollbar-width: none;
-  padding: var(--s-3) var(--gutter) var(--s-1);
+  padding: var(--s-3) var(--gutter) 6px; /* bawah 6 px: area sentuh chip tidak terpotong overflow */
 }
 .s-filters::-webkit-scrollbar { display: none; }
 .s-filters .ui-chip { flex: none; }
@@ -503,10 +532,15 @@
   border-radius: var(--r-md);
   background: var(--surface);
 }
-.s-stats__cell { display: flex; flex-direction: column; gap: 2px; padding: 14px var(--s-4); min-width: 0; }
+.s-stats__cell { display: flex; flex-direction: column; gap: 2px; padding: 14px var(--s-4); min-width: 0; container-type: inline-size; }
 .s-stats__cell + .s-stats__cell { border-left: var(--hairline); }
 .s-stats__label { font: var(--t-footnote); font-weight: 600; color: var(--ink-2); }
-.s-stats__value { font-size: 1.25rem; overflow: hidden; text-overflow: ellipsis; }
+.s-stats__value {
+  /* Menyusut sesuai lebar sel & panjang teks (≈ 0,6 em per karakter tabular); maks. 1,25rem. */
+  font-size: min(1.25rem, calc(100cqi / (var(--len, 10) * 0.6)));
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .s-stats__value.is-positive { color: var(--positive); }
 .s-stats__delta { font: var(--t-footnote); }
 .s-stats__net {
@@ -521,7 +555,7 @@
 .s-delta { font: var(--t-footnote); font-weight: 600; }
 .s-delta.is-good { color: var(--positive); }
 .s-delta.is-bad { color: var(--negative); }
-.s-delta.is-none { color: var(--ink-3); }
+.s-delta.is-none { color: var(--ink-2); }
 .s-kind { padding: var(--s-6) var(--gutter) 0; }
 .s-donut-wrap { display: flex; flex-direction: column; align-items: center; padding: var(--s-6) 0 var(--s-5); }
 .s-donut-empty { font: var(--t-subhead); color: var(--ink-2); margin-top: var(--s-4); }
@@ -568,7 +602,7 @@
 .s-legend i.is-inc { background: var(--accent); margin-left: var(--s-2); }
 .s-trend-card { padding: var(--s-4) var(--s-3) var(--s-2); }
 .s-trend { display: block; width: 100%; height: auto; overflow: visible; }
-.s-trend__max { font: var(--t-caption); fill: var(--ink-3); }
+.s-trend__max { font: var(--t-caption); fill: var(--ink-2); }
 .s-trend__base { stroke: var(--line); stroke-width: .5; }
 .s-trend__col { cursor: pointer; }
 .s-trend__exp { fill: var(--ink-3); transition: fill var(--m-base) var(--ease-std); }

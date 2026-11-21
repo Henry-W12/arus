@@ -44,6 +44,25 @@
   font-weight: 600;
 }
 .ui-btn--block { display: flex; width: 100%; }
+
+/* Area sentuh minimum 44 pt (DESIGN §4, AC-UI-03). Kontrol yang tampil lebih pendek dari 44 px
+ * diperluas tak terlihat lewat ::after — tampilan tidak berubah. Wadah scroll di sekitarnya
+ * harus menyisakan ruang (padding) agar perluasan tidak terpotong overflow. */
+.ui-btn--sm,
+.ui-btn--pill,
+.ui-chip,
+.ui-seg__item { position: relative; }
+.ui-btn--sm::after,
+.ui-btn--pill::after,
+.ui-chip::after,
+.ui-seg__item::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: min(0px, calc((100% - 44px) / 2));
+  bottom: min(0px, calc((100% - 44px) / 2));
+}
 .ui-btn:active:not(:disabled) { transform: scale(.98); }
 
 .ui-btn--primary { background: var(--accent); color: var(--on-accent); }
@@ -171,9 +190,9 @@
 }
 .ui-switch__input {
   position: absolute;
-  inset: 0;
+  inset: -7px 0; /* area sentuh 51×45 (trek tetap 51×31) */
   width: 100%;
-  height: 100%;
+  height: calc(100% + 14px);
   margin: 0;
   opacity: 0;
   z-index: 1;
@@ -290,8 +309,8 @@
   font: var(--t-footnote);
   font-weight: 600;
   color: var(--accent);
-  margin: -12px calc(var(--s-2) * -1) -12px 0;
-  padding: 12px var(--s-2);
+  margin: -13px calc(var(--s-2) * -1) -13px 0;
+  padding: 13px var(--s-2);
 }
 
 .ui-row {
@@ -382,7 +401,7 @@ button.ui-row__content:active,
 .ui-row__trail-main .ui-amount--body { font-weight: 500; }
 .ui-row__trail-sub {
   font: var(--t-footnote);
-  color: var(--ink-3);
+  color: var(--ink-2); /* informasi (saldo berjalan): ink-3 tidak lolos kontras (BUG-10) */
   white-space: nowrap;
   margin-top: 1px;
 }

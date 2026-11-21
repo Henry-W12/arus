@@ -157,7 +157,7 @@ function AccountSheetInner({
           <p className="s-form__label">Saldo awal</p>
           <button type="button" className="s-picker" onClick={() => setAmountOpen(true)}>
             <span className="s-picker__value num">{formatIDR(opening)}</span>
-            <span className="ink-3 t-footnote">Ubah</span>
+            <span className="ink-2 t-footnote">Ubah</span>
           </button>
           <div className="s-switch-card">
             <Switch label="Hitung ke total saldo" checked={include} onChange={setInclude} />

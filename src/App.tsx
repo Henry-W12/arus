@@ -49,7 +49,7 @@ const Gallery = import.meta.env.DEV ? lazy(() => import('./ui/Gallery')) : null
 const SCALE: Record<number, TextScale> = { 1: 'standard', 1.12: 'large', 1.24: 'larger' }
 
 let bootPromise: Promise<InitResult> | null = null
-const boot = () => (bootPromise ??= initDatabase())
+const boot = () => (bootPromise ??= initDatabase(undefined, { runGenerator: false }))
 
 export default function App() {
   useViewportVars()
@@ -94,6 +94,8 @@ function Boot() {
         }
         setOnboarding(r.seeded)
         setSt({ phase: 'ready', firstRun: r.seeded, locked: !!s.pin })
+        // Generator berulang setelah layar pertama tampil; hasil masuk lewat liveQuery + banner.
+        void runRecurring().then((rec) => alive && appStore.noteRecurring(rec.created, rec.since))
       })
       .catch((e: unknown) => {
         if (alive) setSt({ phase: 'error', message: e instanceof Error ? e.message : String(e) })

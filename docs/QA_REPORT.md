@@ -1,4 +1,30 @@
-# QA Report — Arus v1 (fase 4)
+# QA Report — Arus v1 (fase 4, diperbarui fase 5)
+
+## Status perbaikan (fase 5)
+
+Semua 13 bug **Fixed**; AC-UI-03 dan AC-UI-05 kini lulus; AC-IN-01 stabil (diukur terisolasi). Verifikasi: `npm test` (154 tes), `npm run build`, `npm run lint` (0 error), `npm run e2e` (102/102 tes hijau).
+
+| Bug | Status | Commit | Perbaikan (akar masalah) · tes |
+|---|---|---|---|
+| BUG-02 | Fixed | d30505f | Timer auto-hilang & timer unmount toast dipisah (cleanup efek tidak lagi membatalkan unmount). Pertahanan: `.is-leaving` → `pointer-events: none`, `aria-hidden`, aksi diabaikan saat keluar. · `Toast.test.tsx`, `input.spec` BUG-02, `recurring.spec` 23:59:59 |
+| BUG-01 | Fixed | d30505f | Keputusan (PRD §5.1): transaksi terjadwal tidak dihitung di saldo/ringkasan/tren/anggaran/total Cari sampai tanggalnya; tetap tampil di "Terjadwal". Satu helper `src/lib/effective.ts` dipakai semua agregasi; tes penjaga melarang perbandingan tanggal vs today di tempat lain. Cari menampilkan "n terjadwal belum dihitung". · `effective.test.ts`, `money.spec` BUG-01 ×2, `explore.spec` BUG-01 |
+| BUG-03 | Fixed | d30505f | Sub-sheet & dialog TxSheet diturunkan dari `open` induk (tidak bisa terbuka tanpa induk). · `explore.spec` BUG-03 |
+| BUG-04 | Fixed | d30505f | Utilitas `.num`/`.ui-amount`/`.ui-amount-display *` memaksa `tabular-nums` (shorthand `font:` tidak lagi me-reset). · `misc.spec` AC-UI-05 |
+| BUG-05 | Fixed | d30505f | `deltaRatio` membagi `|sebelumnya|`. · `summary.test.ts`, `money.spec` BUG-05 |
+| BUG-06 | Fixed | fase 5b | Area sentuh 44 px lewat `::after` tak terlihat (chip, segmented, tombol sm/pill, tombol banner), switch 51×45, "Urutkan" 44, tutup banner 44×44; padding wadah scroll agar tidak terpotong. · `misc.spec` AC-UI-03 (hit-test `elementFromPoint` di 14 layar) |
+| BUG-07 | Fixed | fase 5b | Nilai Ringkasan menyusut sesuai lebar sel (`cqi`) & panjang teks. · `explore.spec` BUG-07 (tanpa overflow di 3 layar) |
+| BUG-08 | Fixed | fase 5b | Header disembunyikan (`is-loading`, tata letak tetap) sampai saldo & total siap; subjudul pemilih akun tidak "Rp 0". · `money.spec` BUG-08 (sampel tiap frame) |
+| BUG-09 | Fixed | fase 5b | Diverifikasi: ruang scroll bawah (tab bar + FAB + 32) membebaskan semua konten; dikunci tes. · `misc.spec` BUG-09 |
+| BUG-10 | Fixed | fase 5b | Teks informatif (saldo berjalan, "vs bln lalu", "—", label sumbu tren, "Belum diatur", hari di kalender) → `ink-2`. · `misc.spec` AC-UI-03 kontras (pindai semua teks, light & dark) |
+| BUG-11 | Fixed | fase 5b | Konfirmasi harus persis `HAPUS`. · `data.spec` AC-BK-02 |
+| BUG-12 | Fixed | fase 5b | Akar: di WebKit Windows tiap put IndexedDB ±15 ms (400 baris ≈ 6 dtk, juga tanpa indeks — artefak lingkungan). App tidak lagi menahan layar pertama untuk generator: `initDatabase(…, { runGenerator: false })` lalu `runRecurring()` setelah UI tampil. · `recurring.spec` AC-RC-08 (layar < 3 dtk) |
+| BUG-13 | Fixed | fase 5b | Landscape/viewport pendek: keypad di kolom kanan, nominal + chip + kategori di kiri. · `explore.spec` BUG-13 |
+| AC-IN-01 | Stabil | fase 5b | Ukuran waktu dipindah ke project `perf` (bergantung pada semua project lain → berjalan terakhir & sendirian). Target tetap ≤ 1,5 dtk (median & terburuk dari 3 cold start setelah 1 pemanasan = app terpasang). |
+
+Tambahan fase 5b: chip konteks sheet input (Tunai/Hari ini/Catatan/Ulangi) — area sentuh terpotong `overflow-x` wadah; padding atas 6 px + chip ikon diperlebar.
+
+Perbaikan tes (bukan bug app): `data.spec` memilih kategori per nama (urutan dump mengikuti UUID acak → anggaran kadang memakai kategori pemasukan); `settings.spec` menunggu simpan sebelum reload.
+
 
 Tanggal uji: 20–21 Nov 2026. Penguji: QA otomatis (Playwright) + eksplorasi via skrip. Build: produksi (`vite build` + `vite preview`).
 
@@ -24,7 +50,7 @@ L = lulus, G = gagal, S = lulus sebagian, T = tidak dapat diuji (e2e).
 
 | AC | Status | Tes / catatan |
 |---|---|---|
-| AC-IN-01 | L | `input.spec` · goto → sheet terlihat ±1,0 dtk (WebKit desktop, terisolasi). Saat 2 worker paralel kadang > 1,5 dtk, jadi angka ini bukan ukuran iPhone. Mode Keluar, akun terakhir, dan "Hari ini" sesuai. |
+| AC-IN-01 | L | `input.spec` (mode Keluar, akun terakhir, "Hari ini") + `perf.spec` (project `perf`, terisolasi): AC_IN_01_MS. Angka WebKit desktop, bukan iPhone. |
 | AC-IN-02 | L | 4 tap (2, 5, 000, kategori), toast Urungkan, baris teratas "Hari ini" |
 | AC-IN-03 | L | Urungkan menghapus transaksi dan saldo kembali |
 | AC-IN-04 | L | |
@@ -46,7 +72,7 @@ L = lulus, G = gagal, S = lulus sebagian, T = tidak dapat diuji (e2e).
 | AC-LS-05 | L | |
 | AC-LS-06 | L | |
 | AC-LS-07 | S | Diuji dengan 1.406 transaksi (bukan 5.000): tab tampil 772 ms, 250 baris DOM awal. Frame terburuk saat scroll 140 ms ketika halaman berikutnya dimuat (rata-rata 20 ms). Ini WebKit desktop, bukan iPhone. |
-| AC-SM-01 | L | Lulus untuk skenario AC. Jika ada transaksi terjadwal di periode berjalan → BUG-01. |
+| AC-SM-01 | L | Termasuk dengan transaksi terjadwal di periode berjalan (BUG-01 fixed). |
 | AC-SM-02 | L | 67/33, tap segmen → teks tengah + highlight, tap baris → `/cari` terfilter |
 | AC-SM-03 | L | 6 + "Lainnya" |
 | AC-SM-04 | L | ›/‹, batas transaksi pertama, "—". Lihat BUG-05 untuk delta Selisih. |
@@ -66,7 +92,7 @@ L = lulus, G = gagal, S = lulus sebagian, T = tidak dapat diuji (e2e).
 | AC-BG-04 | L | |
 | AC-BG-05 | L | record `amount=0` mulai Nov |
 | AC-BG-06 | L | |
-| AC-BG-07 | L | Transfer & income tidak dihitung. Lihat BUG-01: transaksi terjadwal ikut terhitung. |
+| AC-BG-07 | L | Transfer & income tidak dihitung; transaksi terjadwal juga tidak (BUG-01 fixed). |
 | AC-PR-01 | L | tidak langsung: tautan Ringkasan → `/cari?from=2026-11-01&to=2026-11-30`; unit test `period.test.ts` |
 | AC-PR-02 | L | S=25 pada 26 Nov → "Desember 2026" (25 Nov–24 Des), ‹ → November |
 | AC-PR-03 | T | Fungsi murni; unit test `period.test.ts` lulus |
@@ -79,7 +105,7 @@ L = lulus, G = gagal, S = lulus sebagian, T = tidak dapat diuji (e2e).
 | AC-RC-05 | L | |
 | AC-RC-06 | L | 2, 16, 30 Nov |
 | AC-RC-07 | L | chip Ulangi → 1 transaksi + `generatedCount=1` |
-| AC-RC-08 | L | 400 per run, 731 setelah run kedua. Catatan: reload + generate 400 ≈ 6,6 dtk (BUG-12). |
+| AC-RC-08 | L | 400 per run, 731 setelah run kedua. Layar tampil tanpa menunggu generator (BUG-12 fixed). |
 | AC-RC-09 | L | "Catat yang terlewat (3)" & "Lewati" |
 | AC-RC-10 | L | |
 | AC-SR-01 | L | "kopi" ↔ "KOPI"; "cafe" ↔ "café" |
@@ -101,7 +127,7 @@ L = lulus, G = gagal, S = lulus sebagian, T = tidak dapat diuji (e2e).
 | AC-BK-06 | L | schemaVersion 99 → "Perbarui app" |
 | AC-BK-07 | L | BOM, CRLF, header kolom, quoting koma/kutip/baris baru, "é —", tanda negatif |
 | AC-BK-08 | L | |
-| AC-BK-09 | L | Seed ulang 18 kategori. Lihat BUG-11 (huruf kecil diterima). |
+| AC-BK-09 | L | Seed ulang 18 kategori. Hanya `HAPUS` persis yang diterima (BUG-11 fixed). |
 | AC-BK-10 | L | hash PIN tidak ada di file |
 | AC-PW-01 | L | Chromium: SW aktif → offline → reload, deep link `/ringkasan`, `/?add=1`, simpan transaksi |
 | AC-PW-02 | L | status & pemakaian tampil, `persistGranted` tersimpan |
@@ -111,9 +137,9 @@ L = lulus, G = gagal, S = lulus sebagian, T = tidak dapat diuji (e2e).
 | AC-PW-06 | T | QuotaExceededError tidak bisa dipicu andal di build produksi |
 | AC-UI-01 | L | Sistem live, Terang/Gelap memaksa, warna body ikut |
 | AC-UI-02 | L | 375 px + "Lebih besar": tanpa overflow horizontal di 6 layar |
-| AC-UI-03 | **G** | target < 44 px (BUG-06), kontras `ink-3` pada teks informatif (BUG-10) |
+| AC-UI-03 | L | `misc.spec`: hit-test 44×44 di 14 layar; kontras ≥ 4,5:1 semua teks terlihat (light & dark), kecuali peran tersier DESIGN §2 (nonaktif, placeholder, label tab tidak aktif). BUG-06/10 fixed. |
 | AC-UI-04 | L | sheet hanya transisi opacity 0,12 dtk |
-| AC-UI-05 | **G** | `font-variant-numeric` terhitung `normal` pada nominal (BUG-04) |
+| AC-UI-05 | L | `tabular-nums` terhitung pada nominal (BUG-04 fixed) |
 | AC-UI-06 | S | Semua tombol punya nama (0 tanpa label di 7 layar). Segmen donat & bar tren tidak bisa difokus/dioperasikan keyboard/VoiceOver. VoiceOver asli tidak diuji. |
 | AC-PN-01 | L | konten tidak ada di DOM saat terkunci |
 | AC-PN-02 | L | `visibilityState` disimulasikan + jam: 30 dtk tidak terkunci, 70 dtk terkunci |
@@ -125,7 +151,7 @@ L = lulus, G = gagal, S = lulus sebagian, T = tidak dapat diuji (e2e).
 
 ### Kritis
 
-**BUG-02 · Toast yang sudah hilang tetap menangkap tap → "Urungkan" tak terlihat menghapus transaksi**
+**BUG-02 · Toast yang sudah hilang tetap menangkap tap → "Urungkan" tak terlihat menghapus transaksi** — ✅ Fixed (fase 5)
 - Langkah: catat transaksi (mis. 1.000 Makan) → toast "Tersimpan · Urungkan" muncul → tunggu > 5 dtk sampai toast hilang → tap + → tap ⌫ (atau 0/000) di baris bawah keypad.
 - Diharapkan: ⌫ menghapus digit. Toast sudah tidak ada di DOM.
 - Aktual: elemen `.ui-toast.is-leaving` tetap ada (opacity 0, `pointer-events: auto`) di atas baris bawah keypad, dan tidak pernah di-unmount. Tap di posisi ⌫ mengenai tombol "Urungkan" → transaksi tadi **terhapus tanpa umpan balik** (jumlah transaksi 1 → 0). Di layar Transaksi, toast tak terlihat yang sama menutupi area tepat di atas FAB/tab bar, jadi tap baris daftar di area itu juga bisa memicu Urungkan aksi terakhir (termasuk "Urungkan hapus/edit").
@@ -134,7 +160,7 @@ L = lulus, G = gagal, S = lulus sebagian, T = tidak dapat diuji (e2e).
 
 ### Tinggi
 
-**BUG-01 · Transaksi Terjadwal (tanggal > hari ini) ikut dihitung di Ringkasan, Anggaran, dan Tren, tetapi tidak di header "Bulan ini"**
+**BUG-01 · Transaksi Terjadwal (tanggal > hari ini) ikut dihitung di Ringkasan, Anggaran, dan Tren, tetapi tidak di header "Bulan ini"** — ✅ Fixed (fase 5)
 - Langkah: pada 20 Nov, catat pengeluaran 100.000 (10 Nov) dan pengeluaran Terjadwal 1.250.000 (26 Nov) → lihat header Transaksi lalu tab Ringkasan dan Anggaran.
 - Diharapkan: angka "Pengeluaran" bulan ini sama di semua layar. PRD §3.1/§5.1 menyatakan transaksi terjadwal belum berlaku sebelum tanggalnya. Minimal harus konsisten, atau Ringkasan diberi label "termasuk terjadwal".
 - Aktual: header "Bulan ini −Rp 100.000"; Ringkasan Pengeluaran Rp 1.350.000. Data demo: header Rp 6.437.191 vs Ringkasan Rp 7.687.191 (selisih tepat Rp 1.250.000). Anggaran Makan: pengeluaran terjadwal 400.000 (28 Nov) membuat "Sisa Rp 500.000", bukan 900.000. Sisa per hari dan status warning/lebih ikut terpengaruh.
@@ -144,44 +170,44 @@ L = lulus, G = gagal, S = lulus sebagian, T = tidak dapat diuji (e2e).
 
 ### Sedang
 
-**BUG-03 · Tombol back browser saat sub-sheet terbuka meninggalkan sub-sheet yatim**
+**BUG-03 · Tombol back browser saat sub-sheet terbuka meninggalkan sub-sheet yatim** — ✅ Fixed (fase 5)
 - Langkah: tap baris transaksi (sheet edit) → tap chip tanggal (sheet "Tanggal") → back browser / gestur back.
 - Diharapkan: yang tertutup hanya sub-sheet, atau kedua sheet tertutup dengan rapi.
 - Aktual: URL kembali ke `/` dan sheet edit tertutup, tetapi sheet "Tanggal" tetap terbuka di atas daftar tanpa induk. Memilih tanggal di situ tidak berdampak apa-apa. Back kedua keluar dari app.
 - Dicurigai: `src/screens/TxSheet.tsx` (state `sub` baris 142 tidak di-reset saat `open` menjadi false; sub-sheet dirender dengan `open={sub === 'date'}`). Di iPhone standalone tidak ada tombol back, jadi dampaknya terbatas pada Safari tab, Android, dan desktop.
 - Screenshot: `docs/screens/qa-back-orphan-datepicker.png`.
 
-**BUG-04 · `tabular-nums` hilang pada nominal (AC-UI-05)**
+**BUG-04 · `tabular-nums` hilang pada nominal (AC-UI-05)** — ✅ Fixed (fase 5)
 - Aktual: computed `font-variant-numeric` = `normal` pada nominal baris daftar dan total saldo (WebKit).
 - Sebab (kemungkinan besar): `src/styles/components.css` baris 412–416. `.ui-amount--body/title/amount-l/hero/inherit { font: … }` memakai shorthand `font`, yang me-reset `font-variant-numeric` yang dipasang `.ui-amount` (baris 410). Hal yang sama mungkin berlaku untuk `.num` yang dikombinasikan dengan aturan `font:` lain.
 - Tes: `misc.spec.ts` "AC-UI-05".
 
-**BUG-05 · Delta % "Selisih" terbalik bila periode sebelumnya negatif**
+**BUG-05 · Delta % "Selisih" terbalik bila periode sebelumnya negatif** — ✅ Fixed (fase 5)
 - Langkah: Okt pengeluaran 200rb (selisih −200rb), Nov pengeluaran 100rb (selisih −100rb) → Ringkasan Nov.
 - Diharapkan: perbaikan (defisit mengecil) tampil sebagai ▲ / warna baik.
 - Aktual: "▼ 50%" berwarna `negative` (is-bad).
 - Dicurigai: `src/lib/summary.ts` `deltaRatio` (baris 81) membagi dengan `previous` yang negatif. Pakai `Math.abs(previous)`.
 - Tes: `money.spec.ts` "BUG-05".
 
-**BUG-06 · Target sentuh < 44 px (AC-UI-03)**
+**BUG-06 · Target sentuh < 44 px (AC-UI-03)** — ✅ Fixed (fase 5)
 - Segmented control (Ringkasan Pengeluaran/Pemasukan, Tema, Ukuran teks) 28 px tinggi. Chip filter & saran di Cari 32 px. Tombol "Transfer" di Akun 40 px. "Urutkan" 42 px.
 - Hasil ukur: `explore.spec.ts` "aksesibilitas dasar". DESIGN.md §4 menetapkan minimal 44×44. Area sentuh bisa diperbesar tanpa mengubah tampilan (padding/pseudo-element).
 
 ### Rendah
 
-**BUG-07 · Angka Ringkasan terpotong untuk nominal besar.** Pemasukan/Pengeluaran 12 digit tampil "Rp 999.999.9…" (ellipsis, tanpa auto-shrink). Dicurigai `.s-stats__value` di `src/styles/screens.css`. Screenshot `docs/screens/qa-summary-max-amount.png`. Layar lain (daftar, total saldo, akun, sheet input) menampilkan Rp 999.999.999.999 utuh.
+**BUG-07 · Angka Ringkasan terpotong untuk nominal besar.** ✅ Fixed (fase 5). Pemasukan/Pengeluaran 12 digit tampil "Rp 999.999.9…" (ellipsis, tanpa auto-shrink). Dicurigai `.s-stats__value` di `src/styles/screens.css`. Screenshot `docs/screens/qa-summary-max-amount.png`. Layar lain (daftar, total saldo, akun, sheet input) menampilkan Rp 999.999.999.999 utuh.
 
-**BUG-08 · Kilasan nilai salah saat memuat.** Header menampilkan "Total saldo Rp 0" dan "Bulan ini Rp 0" sebelum data siap (`src/screens/Transactions.tsx` baris 99, `bal?.total ?? 0`). Ringkasan sempat kosong total (hanya judul). Untuk app keuangan, "Rp 0" sesaat bisa membuat pengguna kaget. Lebih baik placeholder/skeleton. Terlihat saat screenshot diambil sebelum data selesai dimuat.
+**BUG-08 · Kilasan nilai salah saat memuat.** ✅ Fixed (fase 5). Header menampilkan "Total saldo Rp 0" dan "Bulan ini Rp 0" sebelum data siap (`src/screens/Transactions.tsx` baris 99, `bal?.total ?? 0`). Ringkasan sempat kosong total (hanya judul). Untuk app keuangan, "Rp 0" sesaat bisa membuat pengguna kaget. Lebih baik placeholder/skeleton. Terlihat saat screenshot diambil sebelum data selesai dimuat.
 
-**BUG-09 · FAB menutupi konten paling bawah** saat belum di-scroll: nominal baris di daftar Transaksi, bar periode berjalan di Tren, dan nilai Anggaran (`qa-transactions-light.png`, `qa-budgets-light.png`, `qa-summary-max-amount.png`). Tidak pasti apakah ruang scroll bawah sudah cukup untuk membebaskan baris terakhir. Perlu dicek di iPhone.
+**BUG-09 · FAB menutupi konten paling bawah** (✅ Fixed fase 5) saat belum di-scroll: nominal baris di daftar Transaksi, bar periode berjalan di Tren, dan nilai Anggaran (`qa-transactions-light.png`, `qa-budgets-light.png`, `qa-summary-max-amount.png`). Tidak pasti apakah ruang scroll bawah sudah cukup untuk membebaskan baris terakhir. Perlu dicek di iPhone.
 
-**BUG-10 · Kontras `ink-3` dipakai untuk informasi.** `ink-3` = 2,35:1 (light, di `bg`) / 2,59:1 (di `surface`). Dipakai untuk saldo berjalan "Saldo Rp …" di Detail akun (`.ui-row__trail-sub`, informasi audit) dan "vs bln lalu"/"—". DESIGN.md menyatakan `ink-3` bukan untuk informasi penting. Kontras teks utama/sekunder lulus: ink-2 5,24–5,77 (light), 6,6–7,9 (dark).
+**BUG-10 · Kontras `ink-3` dipakai untuk informasi.** ✅ Fixed (fase 5). `ink-3` = 2,35:1 (light, di `bg`) / 2,59:1 (di `surface`). Dipakai untuk saldo berjalan "Saldo Rp …" di Detail akun (`.ui-row__trail-sub`, informasi audit) dan "vs bln lalu"/"—". DESIGN.md menyatakan `ink-3` bukan untuk informasi penting. Kontras teks utama/sekunder lulus: ink-2 5,24–5,77 (light), 6,6–7,9 (dark).
 
-**BUG-11 · Konfirmasi "Hapus semua data" menerima `hapus` (huruf kecil).** `src/screens/shared.tsx` baris 808 (`toUpperCase()`). PRD meminta ketik `HAPUS`. Mungkin disengaja (autoCapitalize), tetapi melemahkan friksi pada aksi destruktif.
+**BUG-11 · Konfirmasi "Hapus semua data" menerima `hapus` (huruf kecil).** ✅ Fixed (fase 5). `src/screens/shared.tsx` baris 808 (`toUpperCase()`). PRD meminta ketik `HAPUS`. Mungkin disengaja (autoCapitalize), tetapi melemahkan friksi pada aksi destruktif.
 
-**BUG-12 · Generator berulang besar lambat (tidak pasti).** Reload + 400 kejadian ≈ 6,6 dtk (reload biasa ≈ 1 dtk) di WebKit desktop. App tetap jalan, tetapi di iPhone lama bisa terasa beku. Perlu diukur di perangkat.
+**BUG-12 · Generator berulang besar lambat (tidak pasti).** ✅ Fixed (fase 5). Reload + 400 kejadian ≈ 6,6 dtk (reload biasa ≈ 1 dtk) di WebKit desktop. App tetap jalan, tetapi di iPhone lama bisa terasa beku. Perlu diukur di perangkat.
 
-**BUG-13 · Landscape / viewport pendek (tidak pasti).** Pada 844×390, `/?sheet=add` tidak memperlihatkan keypad utuh dan sheet tidak tampak di screenshot (`qa-landscape-input.png`). Manifest `orientation: portrait`, tetapi iOS tidak selalu mengunci orientasi web app. Prioritas rendah.
+**BUG-13 · Landscape / viewport pendek (tidak pasti).** ✅ Fixed (fase 5). Pada 844×390, `/?sheet=add` tidak memperlihatkan keypad utuh dan sheet tidak tampak di screenshot (`qa-landscape-input.png`). Manifest `orientation: portrait`, tetapi iOS tidak selalu mengunci orientasi web app. Prioritas rendah.
 
 ### Observasi lain (bukan bug / perlu keputusan)
 - Lebar 320 px dan nama kategori 24 karakter: tidak ada overflow horizontal. Label kategori panjang di-ellipsis rapi (`qa-transactions-long-note.png`, `qa-summary-long-category.png`).

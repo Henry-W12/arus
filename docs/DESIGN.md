@@ -128,7 +128,7 @@ Prefiks "Rp" pada hero: 0,5× ukuran angka, bobot 500, warna `ink-2`, jarak 4 px
 - Mode Masuk: angka berwarna `positive`. Mode Keluar/Transfer: `ink`.
 
 ### 6.3 List row
-- Tinggi 60. Padding 16 kiri/kanan. Ikon 32 (kiri) → gap 12 → judul `--t-body` (1 baris, ellipsis) + subjudul `--t-subhead` `ink-2` → kanan: nominal `--t-body` 500 tabular, dan opsional baris kecil `--t-footnote` `ink-3` (saldo berjalan di detail akun).
+- Tinggi 60. Padding 16 kiri/kanan. Ikon 32 (kiri) → gap 12 → judul `--t-body` (1 baris, ellipsis) + subjudul `--t-subhead` `ink-2` → kanan: nominal `--t-body` 500 tabular, dan opsional baris kecil `--t-footnote` `ink-2` (saldo berjalan di detail akun; informasi → bukan `ink-3`).
 - Tekan: latar `surface-pressed` (tanpa delay, dilepas 150 ms).
 - Swipe kiri: tombol Hapus selebar 88 px (`negative-soft` + teks `negative`). Swipe penuh > 60% → hapus langsung.
 - Baris baru: latar `accent-soft` yang memudar dalam 1,2 dtk.

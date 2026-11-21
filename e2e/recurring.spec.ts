@@ -99,11 +99,13 @@ test('AC-RC-08 · harian sejak 2 tahun lalu → maks 400 per run, sisanya di run
   await putRows(page, 'recurring', [r])
   const t0 = Date.now()
   await reload(page)
-  const ms = Date.now() - t0
-  expect((await dates(page, r.id)).length).toBe(400)
-  console.log(`[AC-RC-08] reload + generate 400 = ${ms} ms`)
+  // BUG-12: layar pertama tidak menunggu generator (sebelumnya ±6,6 dtk di WebKit Windows).
+  const screenMs = Date.now() - t0
+  await expect.poll(async () => (await dates(page, r.id)).length, { timeout: 20_000 }).toBe(400)
+  console.log(`[AC-RC-08] layar tampil ${screenMs} ms; 400 kejadian tercatat ${Date.now() - t0} ms`)
+  expect(screenMs, 'layar pertama tidak boleh menunggu generator').toBeLessThan(3000)
   await reload(page)
-  expect((await dates(page, r.id)).length).toBe(731) // 20 Nov 2024 … 20 Nov 2026 inklusif
+  await expect.poll(async () => (await dates(page, r.id)).length, { timeout: 20_000 }).toBe(731) // 20 Nov 2024 … 20 Nov 2026 inklusif
 })
 
 test('AC-RC-09 · aktifkan lagi aturan dijeda: "Catat yang terlewat (N)" membuat N transaksi', async ({ page }) => {

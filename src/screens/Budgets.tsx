@@ -89,7 +89,7 @@ export function BudgetsScreen() {
                     key={c.id}
                     leading={<CategoryIcon icon={c.icon} color={c.color} />}
                     title={c.name}
-                    trailing={b ? <AmountText value={b} /> : <span className="ink-3">Belum diatur</span>}
+                    trailing={b ? <AmountText value={b} /> : <span className="ink-2">Belum diatur</span>}
                     chevron
                     onClick={() => openSheet(c.id)}
                   />

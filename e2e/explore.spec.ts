@@ -89,7 +89,7 @@ test('Eksplorasi · BUG-01 dengan data demo: Ringkasan vs header "Bulan ini" vs 
   expect(digits(summ) - heroExp, 'selisih = premi terjadwal 1.250.000 (BUG-01)').toBe(0)
 })
 
-test('Eksplorasi · nominal maksimum Rp 999.999.999.999 di semua layar', async ({ page }) => {
+test('BUG-07 · nominal maksimum Rp 999.999.999.999 utuh di semua layar', async ({ page }) => {
   const d = await boot(page)
   await setOpening(page, d, { 'Rekening Bank': -999999999999 })
   await seedTx(page, d, [{ type: 'income', amount: 999999999999, category: 'Gaji', account: 'Tunai', note: 'Gaji maksimal' }])
@@ -119,6 +119,8 @@ test('Eksplorasi · nominal maksimum Rp 999.999.999.999 di semua layar', async (
   await shot(page, 'accounts-max-amount')
   const o3 = await overflow()
   console.log('[ukur] overflow nominal besar:', JSON.stringify({ transaksi: o1, ringkasan: o2, akun: o3 }))
+  // BUG-07: nominal 12 digit tampil utuh (tanpa ellipsis) di semua layar
+  expect({ transaksi: o1, ringkasan: o2, akun: o3 }).toEqual({ transaksi: [], ringkasan: [], akun: [] })
   // total saldo bisa melampaui 12 digit (2 × 999 M − 999 M) — tetap harus integer aman
   expect((await transactions(page)).every((t) => Number.isSafeInteger(t.amount))).toBe(true)
 })
@@ -293,15 +295,25 @@ test('Eksplorasi · console error/warning di semua layar', async ({ page }) => {
   expect(logs.filter((l) => l.type !== 'warning')).toEqual([])
 })
 
-test('Eksplorasi · landscape 844×390 & lebar 320', async ({ page }) => {
+test('BUG-13 · landscape 844×390 & lebar 320', async ({ page }) => {
   const d = await boot(page)
   await demo(page, d, 30)
   await page.setViewportSize({ width: 844, height: 390 })
   await reload(page, '/')
   await reload(page, '/?sheet=add')
-  await page.waitForTimeout(400)
+  await expect(txSheet(page)).toBeVisible()
+  await page.waitForTimeout(600)
   await shot(page, 'landscape-input')
-  const keypadVisible = await page.locator('.tx-sheet .ui-keypad__grid').evaluate((el) => el.getBoundingClientRect().bottom <= innerHeight + 1)
+  // BUG-13: di landscape keypad, chip konteks, dan kategori pertama terlihat utuh tanpa scroll
+  const inView = (sel: string) =>
+    page.locator(sel).first().evaluate((el) => {
+      const r = el.getBoundingClientRect()
+      return r.top >= 0 && r.bottom <= innerHeight + 1 && r.height > 0
+    })
+  const keypadVisible = await inView('.tx-sheet .ui-keypad__grid')
+  expect(keypadVisible, 'keypad').toBe(true)
+  expect(await inView('.tx-sheet .tx-sheet__ctx'), 'chip konteks').toBe(true)
+  expect(await inView('.tx-sheet .ui-cat-cell'), 'kategori').toBe(true)
   await page.setViewportSize({ width: 320, height: 568 })
   await reload(page, '/?sheet=add')
   await page.waitForTimeout(400)

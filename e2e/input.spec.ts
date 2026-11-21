@@ -26,12 +26,9 @@ test('AC-IN-01 · cold start openToAdd=true membuka sheet input (Keluar, akun te
   const d = await boot(page)
   const bank = d.accounts.find((a) => a.name === 'Rekening Bank')!.id
   await setSettingsRaw(page, { openToAdd: true, lastAccountId: bank })
-  const t0 = Date.now()
+  // Batas waktu ≤ 1,5 dtk diukur terisolasi di e2e/perf.spec.ts (project `perf`, tanpa worker paralel).
   await page.goto('/')
   await expect(txSheet(page)).toBeVisible()
-  const ms = Date.now() - t0
-  console.log(`[ukur] AC-IN-01 goto → sheet terlihat: ${ms} ms`)
-  expect(ms, `sheet terbuka dalam ${ms} ms`).toBeLessThan(1500)
   await expect(page.locator('.tx-sheet__seg [role=radio][aria-checked=true]')).toHaveText('Keluar')
   await expect(page.locator('.tx-sheet__ctx')).toContainText('Rekening Bank')
   await expect(page.locator('.tx-sheet__ctx')).toContainText('Hari ini')
@@ -56,6 +53,7 @@ test('AC-IN-02 · 25.000 Makan & Minum tersimpan dalam 4 tap + toast + baris ter
 
 test('AC-IN-03 · Urungkan setelah simpan menghapus transaksi & saldo kembali', async ({ page }) => {
   await boot(page)
+  await expect(page.locator('.s-hero:not(.is-loading)')).toBeVisible() // saldo selesai dimuat (BUG-08)
   const before = await textOf(page.locator('.s-hero__value'))
   await openAdd(page)
   await keys(page, ['5', '000'])

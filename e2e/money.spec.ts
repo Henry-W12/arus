@@ -351,3 +351,32 @@ test('BUG-05 · delta Selisih: defisit mengecil (−200rb → −100rb) harus ta
   console.log('[ukur] delta selisih:', await delta.innerText(), await delta.getAttribute('class'))
   await expect(delta).toHaveClass(/is-good/)
 })
+
+// BUG-08: selama data dimuat header tidak boleh pernah menampilkan "Rp 0" palsu (saldo sebenarnya 1.500.000).
+test('BUG-08 · header Total saldo tidak berkedip "Rp 0" saat memuat', async ({ page }) => {
+  const d = await boot(page)
+  await setOpening(page, d, { Tunai: 1_500_000 })
+  await page.addInitScript(() => {
+    const seen: string[] = []
+    ;(window as unknown as { __heroSeen: string[] }).__heroSeen = seen
+    const check = () => {
+      const v = document.querySelector('.s-hero__value')
+      if (!v) return
+      const hero = v.closest('.s-hero')
+      if (hero?.classList.contains('is-loading') || getComputedStyle(v).visibility === 'hidden') return
+      seen.push(v.textContent ?? '')
+    }
+    // Sampel tiap frame (yang benar-benar dilihat pengguna) + tiap mutasi DOM.
+    new MutationObserver(check).observe(document, { subtree: true, childList: true, characterData: true, attributes: true })
+    const frame = () => {
+      check()
+      if (seen.length < 5) requestAnimationFrame(frame)
+    }
+    requestAnimationFrame(frame)
+  })
+  await reload(page, '/')
+  await expect(page.locator('.s-hero__value')).toContainText('1.500.000')
+  const seen = await page.evaluate(() => (window as unknown as { __heroSeen: string[] }).__heroSeen)
+  expect(seen.length).toBeGreaterThan(0)
+  expect(seen.filter((t) => !t.includes('1.500.000'))).toEqual([])
+})

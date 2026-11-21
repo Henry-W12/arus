@@ -156,6 +156,7 @@ test('AC-CT-01/04 · tambah kategori "Kopi" → ada di input (via Lainnya…); g
   await page.locator('.ui-row__content', { hasText: /^Belanja$/ }).click()
   await page.getByLabel('Nama').fill('Belanja Online')
   await page.locator('.ui-sheet.is-open').getByRole('button', { name: 'Simpan' }).click()
+  await expect(page.locator('.ui-row', { hasText: 'Belanja Online' })).toBeVisible() // tunggu tersimpan sebelum reload
   await reload(page, '/')
   await expect(page.locator('.s-daylist .ui-row').first()).toContainText('Belanja Online')
 })
