@@ -9,7 +9,7 @@ Aplikasi pencatat keuangan pribadi, dipasang di iPhone lewat Safari → "Add to 
 ## Keputusan
 - PWA (bukan native): gratis, offline, data lokal di perangkat (IndexedDB), backup/restore JSON.
 - Stack: Vite + React + TypeScript, Dexie (IndexedDB), vite-plugin-pwa. Tanpa backend.
-- Hosting: Cloudflare Pages. Catatan teknis iOS di `docs/IOS_PWA_NOTES.md` (ekspor pakai `navigator.share({files})`, safe-area, font input ≥16px).
+- Hosting: Cloudflare Pages, project `arus` → https://arus-9wy.pages.dev. Deploy: `npm run build` lalu `npx wrangler pages deploy dist --project-name arus --branch main --commit-dirty=true` (langkah di `docs/DEPLOY.md`). Catatan teknis iOS di `docs/IOS_PWA_NOTES.md` (ekspor pakai `navigator.share({files})`, safe-area, font input ≥16px).
 
 - Nama app: **Arus**. Spesifikasi produk di `docs/PRD.md` (acceptance criteria AC-* untuk QA), visual di `docs/DESIGN.md` (semua warna/ukuran lewat token).
 - Transaksi Terjadwal (`date > hari ini`) tidak dihitung di saldo/ringkasan/tren/anggaran/total Cari sampai tanggalnya; satu-satunya implementasi: `src/lib/effective.ts` (tes penjaga melarang `.date <=/> today` di tempat lain).

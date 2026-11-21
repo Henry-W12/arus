@@ -1,5 +1,7 @@
 # Deploy & pasang di iPhone
 
+**URL produksi: https://arus-9wy.pages.dev** (project Cloudflare Pages `arus`, dibuat 21 Nov 2026).
+
 Arus dihosting di **Cloudflare Pages** (gratis, HTTPS, bandwidth tak terbatas). Service worker butuh HTTPS, jadi app harus diakses lewat URL `https://…pages.dev`, bukan IP lokal.
 
 ## Deploy pertama (sekali saja)
@@ -9,15 +11,17 @@ Arus dihosting di **Cloudflare Pages** (gratis, HTTPS, bandwidth tak terbatas). 
    ```powershell
    npm run build
    npx wrangler login            # membuka browser untuk izin akun Cloudflare
-   npx wrangler pages project create arus --production-branch main
+   npx wrangler pages project create arus --production-branch main --force   # --force: wrangler 4.x mengalihkan ke Workers tanpa ini
    npx wrangler pages deploy dist --project-name arus --branch main
    ```
-3. URL produksi muncul di output, misalnya `https://arus-xxx.pages.dev`.
+3. URL produksi muncul di output (`https://arus-9wy.pages.dev`).
+
+Jika `wrangler login` gagal dengan "localhost refused to connect": jalankan dari jendela PowerShell biasa dan biarkan terbuka sampai selesai (jangan lewat `!` di Claude Code), atau pakai `$env:CLOUDFLARE_API_TOKEN` (izin Account → Cloudflare Pages → Edit).
 
 ## Update berikutnya
 
 ```powershell
-npm run build; if ($?) { npx wrangler pages deploy dist --project-name arus --branch main }
+npm run build; if ($?) { npx wrangler pages deploy dist --project-name arus --branch main --commit-dirty=true }
 ```
 
 Di iPhone, app menampilkan toast **"Versi baru tersedia"** saat dibuka berikutnya; ketuk untuk memuat ulang.
