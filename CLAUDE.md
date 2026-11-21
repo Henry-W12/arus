@@ -35,4 +35,5 @@ Aplikasi pencatat keuangan pribadi, dipasang di iPhone lewat Safari → "Add to 
 - Data uji ditulis langsung ke IndexedDB lewat `e2e/helpers.ts` (`boot`, `seedTx`, `putRows`) lalu reload; jam dipalsukan `page.clock` (default 20 Nov 2026 10:00 WIB). Tes yang gagal karena bug diberi ID `BUG-xx` dari `docs/QA_REPORT.md`.
 
 ## Aturan
+- Repo **publik**: https://github.com/Henry-W12/arus (pengecualian dari default private). Sebelum push, pastikan tidak ada data pribadi, rahasia, atau data keuangan asli (data demo/screenshot harus fiktif).
 - `node_modules`, `dist`, `.env`, data/backup tidak masuk repo.
